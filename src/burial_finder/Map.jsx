@@ -17,7 +17,7 @@ import { React, useState, useEffect, useMemo, useRef, useCallback } from "react"
 // Leaflet and Map-related Dependencies
 import { MapContainer, Popup, Marker, GeoJSON, LayersControl, LayerGroup, useMap } from "react-leaflet";
 import L from 'leaflet';  // Core Leaflet library for map functionality
-import "./index.css";
+import "../styling/index.css";
 import 'leaflet.markercluster/dist/leaflet.markercluster';  // Clustering support for markers
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';

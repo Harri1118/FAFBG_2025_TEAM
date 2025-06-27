@@ -36,6 +36,7 @@ import {
 import PinDropIcon from '@mui/icons-material/PinDrop';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import HomeIcon from '@mui/icons-material/Home';
@@ -93,7 +94,7 @@ const MARKER_COLORS = [
 /**
  * Default zoom level for focusing on specific locations
  */
-const ZOOM_LEVEL = 18;
+const ZOOM_LEVEL = 19;
 
 //=============================================================================
 // Style Definitions
@@ -176,7 +177,7 @@ function MapBounds() {
     
     // Set map constraints
     map.setMaxBounds(paddedBounds);
-    map.setMinZoom(13);
+    map.setMinZoom(15);
     map.setMaxZoom(25);
 
     // Initial fit to bounds
@@ -193,37 +194,6 @@ function MapBounds() {
  */
 function VectorBasemap({ name }) {
   return <BasemapLayer name={name} maxZoom={25} maxNativeZoom={19} />;
-}
-
-/**
- * Button component that resets the map view to the default extent
- */
-function DefaultExtentButton() {
-  const map = useMap();
-  
-  const handleClick = () => {
-    const defaultBounds = [
-      [42.694180, -73.741980], // Southwest corner
-      [42.714180, -73.721980]  // Northeast corner
-    ];
-    map.fitBounds(defaultBounds);
-  };
-  
-  return (
-    <Paper 
-      elevation={3}
-      sx={{
-        position: 'absolute',
-        top: '150px',
-        right: '10px',
-        zIndex: 1000,
-      }}
-    >
-      <IconButton onClick={handleClick} size="small" title="Return to Default Extent">
-        <HomeIcon />
-      </IconButton>
-    </Paper>
-  );
 }
 
 /**
@@ -342,6 +312,36 @@ function RoutingControl({ from, to }) {
   return null;
 }
 
+/**
+ * Button component that resets the map view to the default extent
+ */
+function DefaultExtentButton() {
+  const map = useMap();
+  
+  const handleClick = () => {
+    const defaultBounds = [
+      [42.694180, -73.741980], // Southwest corner
+      [42.714180, -73.721980]  // Northeast corner
+    ];
+    map.fitBounds(defaultBounds);
+  };
+  
+  return (
+    <Paper 
+      elevation={3}
+      sx={{
+        position: 'absolute',
+        top: '150px',
+        right: '10px',
+        zIndex: 1000,
+      }}
+    >
+      <IconButton onClick={handleClick} size="small" title="Return to Default Extent">
+        <HomeIcon />
+      </IconButton>
+    </Paper>
+  );
+}
 //=============================================================================
 // Main Map Component
 //=============================================================================
@@ -384,10 +384,69 @@ export default function ToursMap() {
 
   // Component References
   const { BaseLayer } = LayersControl;
-  const markerClusterRef = useRef(null);
+  
+  const onLocateMarker = () => {
+    if (!navigator.geolocation) {
+      setStatus('Geolocation is not supported by your browser');
+      return;
+    }
 
+    if (watchId) {
+      navigator.geolocation.clearWatch(watchId);
+    }
 
+    setStatus('Locating...');
 
+    const id = navigator.geolocation.watchPosition(
+      (position) => {
+        const point = turf.point([position.coords.longitude, position.coords.latitude]);
+        const boundaryPolygon = ARC_Boundary.features[0];
+        const bufferedBoundary = turf.buffer(boundaryPolygon, 8, { units: 'kilometers' });
+        const isWithinBuffer = turf.booleanPointInPolygon(point, bufferedBoundary);
+        
+        if (isWithinBuffer) {
+          setStatus('Location active');
+          setLat(position.coords.latitude);
+          setLng(position.coords.longitude);
+          
+        } else {
+          setStatus('You must be within 5 miles of Albany Rural Cemetery');
+          setLat(null);
+          setLng(null);
+        }
+      },
+      (error) => {
+        setStatus('Unable to retrieve your location');
+        console.error('Geolocation error:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000
+      }
+    );
+    setWatchId(id);
+  };
+  function LocationButton(){
+    return (
+      <Paper 
+      elevation={3}
+      sx={{
+        position: 'absolute',
+        top: '200px',
+        right: '10px',
+        zIndex: 1000,
+      }}
+    >
+      <IconButton >
+        <Button onClick={onLocateMarker}>
+        <LocationOnIcon/>
+        </Button>
+        
+      </IconButton>
+      </Paper>
+    )
+  }
   return (
     <div className="map-container">
       <MapContainer
@@ -399,10 +458,11 @@ export default function ToursMap() {
       >
         <CustomZoomControl />
         <DefaultExtentButton />
+        <LocationButton/>
         <MapBounds />
         <LayersControl>
-        <BaseLayer checked name="Streets">
-            <VectorBasemap name="Streets" />
+        <BaseLayer checked name="Topographic">
+            <VectorBasemap name="Topographic" />
           </BaseLayer>
           <BaseLayer name="Imagery">
             <VectorBasemap name="ImageryClarity" />
@@ -417,7 +477,9 @@ export default function ToursMap() {
               <GeoJSON data={ARC_Boundary} style={exteriorStyle}/>
             </LayersControl.Overlay>
           </LayerGroup>
-          
+        
+
+           
           {/* Location Marker */}
           {lat && lng && (
             <Marker position={[lat, lng]}>
@@ -438,63 +500,3 @@ export default function ToursMap() {
     </div>
   );
 }
-
-          {/* Location Button */}
-          // <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-          //   <Button 
-          //     onClick={onLocateMarker} 
-          //     variant='contained' 
-          //     color='secondary' 
-          //     size='small' 
-          //     startIcon={<PinDropIcon />}
-          //     sx={{ flex: 1 }}
-          //   >
-          //     {status}
-          //   </Button>
-          // </Box>
-
-
-            /**
-   * Handles user location tracking
-   * Checks if user is within 5 miles of the cemetery
-   */
-  // const onLocateMarker = () => {
-  //   if (!navigator.geolocation) {
-  //     setStatus('Geolocation is not supported by your browser');
-  //     return;
-  //   }
-
-  //   if (watchId) {
-  //     navigator.geolocation.clearWatch(watchId);
-  //   }
-
-  //   setStatus('Locating...');
-  //   const id = navigator.geolocation.watchPosition(
-  //     (position) => {
-  //       const point = turf.point([position.coords.longitude, position.coords.latitude]);
-  //       const boundaryPolygon = ARC_Boundary.features[0];
-  //       const bufferedBoundary = turf.buffer(boundaryPolygon, 8, { units: 'kilometers' });
-  //       const isWithinBuffer = turf.booleanPointInPolygon(point, bufferedBoundary);
-        
-  //       if (isWithinBuffer) {
-  //         setStatus('Location active');
-  //         setLat(position.coords.latitude);
-  //         setLng(position.coords.longitude);
-  //       } else {
-  //         setStatus('You must be within 5 miles of Albany Rural Cemetery');
-  //         setLat(null);
-  //         setLng(null);
-  //       }
-  //     },
-  //     (error) => {
-  //       setStatus('Unable to retrieve your location');
-  //       console.error('Geolocation error:', error);
-  //     },
-  //     {
-  //       enableHighAccuracy: true,
-  //       maximumAge: 0,
-  //       timeout: 5000
-  //     }
-  //   );
-  //   setWatchId(id);
-  // };

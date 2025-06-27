@@ -6,6 +6,7 @@ import ToursMap from './tours_finder/Tours_Map'
 function App() {
   return (
     <ToursMap/>
+    // <BurialMap/>
   );
 }
 

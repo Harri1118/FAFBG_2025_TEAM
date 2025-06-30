@@ -26,7 +26,7 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'lrm-graphhopper';  // GraphHopper routing integration
 import * as turf from '@turf/turf';  // Geospatial calculations library
 import { BasemapLayer } from 'react-esri-leaflet';  // ESRI basemap integration
-
+import ToursLayer from "./ToursLayer";
 // Material-UI Components and Icons
 import { 
   Autocomplete, TextField, Paper, InputAdornment, IconButton,
@@ -95,7 +95,23 @@ const MARKER_COLORS = [
  * Default zoom level for focusing on specific locations
  */
 const ZOOM_LEVEL = 19;
-
+// https://www.albany.edu/arce/assets/files/ARC_Sections.geojson
+const URLS = [
+  "https://www.albany.edu/arce/assets/files/Sec49.csv",
+  "https://www.albany.edu/arce/assets/files/Projected_Sec75_Headstones.geojson",
+  "https://www.albany.edu/arce/assets/files/Projected_Sec49_Headstones.geojson",
+  "https://www.albany.edu/arce/assets/files/NotablesTour20.geojson",
+  "https://www.albany.edu/arce/assets/files/IndependenceTour20.geojson",
+  "https://www.albany.edu/arce/assets/files/AfricanAmericanTour20.geojson",
+  "https://www.albany.edu/arce/assets/files/ArtistTour20.geojson",
+  "https://www.albany.edu/arce/assets/files/AssociationsTour20.geojson",
+  "https://www.albany.edu/arce/assets/files/AuthorsPublishersTour20.geojson",
+  "https://www.albany.edu/arce/assets/files/BusinessFinanceTour20.geojson",
+  "https://www.albany.edu/arce/assets/files/CivilWarTour20.geojson",
+  "https://www.albany.edu/arce/assets/files/garFixed2.geojson",
+  "https://www.albany.edu/arce/assets/files/AlbanyMayors_fixed.geojson",
+  "https://www.albany.edu/arce/assets/files/SocietyPillarsTour20.geojson"
+]
 //=============================================================================
 // Style Definitions
 //=============================================================================
@@ -109,6 +125,11 @@ const exteriorStyle = {
   fillOpacity: 0
 };
 
+const sectionBoundaryStyle = {
+  color: "#2468F0",
+  weight: 1.5,
+  fillOpacity: 0.2
+}
 /**
  * Style configuration for cemetery roads
  */
@@ -477,7 +498,39 @@ export default function ToursMap() {
               <GeoJSON data={ARC_Boundary} style={exteriorStyle}/>
             </LayersControl.Overlay>
           </LayerGroup>
-        
+        <LayerGroup>
+          <LayersControl.Overlay name="Sections">
+            <GeoJSON data={ARC_Sections} style={sectionBoundaryStyle}
+            onEachFeature={(feature, layer) => {
+              // Create tooltip but don't bind it yet
+              const tooltip = L.tooltip({
+                permanent: true,
+                direction: 'center',
+                className: 'section-label'
+              });
+              
+              layer.on({
+                // Show label on mouseover if not already selected
+                mouseover: () => {
+                  if (feature.properties.Section !== sectionFilter && currentZoom < ZOOM_LEVELS.SECTION) {
+                    if(feature.properties.Section_Di == 49)
+                      tooltip.setContent(`Section ${feature.properties.Section_Di} Lot ${feature.properties.Lot}: ${feature.properties.Comments}`);
+                    else
+                      tooltip.setContent(`Section ${feature.properties.Section_Di}`);
+                    layer.bindTooltip(tooltip).openTooltip();
+                  }
+                },
+                // Hide label on mouseout if not selected
+                mouseout: () => {
+                  if (feature.properties.Section !== sectionFilter && currentZoom < ZOOM_LEVELS.SECTION) {
+                    layer.unbindTooltip();
+                  }
+                },
+              });
+            }}
+            />
+          </LayersControl.Overlay>
+        </LayerGroup>
 
            
           {/* Location Marker */}

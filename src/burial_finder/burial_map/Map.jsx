@@ -11,13 +11,35 @@
 // External Dependencies
 //=============================================================================
 
+
+import ZoomControl from './components/Map/ZoomControl';
+import {DefaultExtentButton}from './components/Map/DefaultExtentButton';
+import MapBounds from './components/Map/MapBounds';
+import RoutingControl from './components/Map/RoutingControl';
+import VectorBasemap from './components/Map/VectorBasemap';
+import {createOnEachTourFeature} from './components/Map/ResultMarker';
+import MapController from './components/Map/MapController';
+import CustomZoomControl from './components/Map/ZoomControl'; 
+import { TourFilter } from './components/Map/TourFilter';
+import { SearchController } from './components/Map/SearchController';
+
+
+import { createMarkeIcon, createNumberedIcon} from './utils/markerUtils';
+import { smartSearch } from './utils/searchUtils';
+import { TOURS } from './utils/tourConfig';
+import TOUR_DATA from './utils/tourConfig';
+import { UNIQUE_SECTIONS } from './utils/mapUtils'; 
+import { getImagePath } from './utils/getImagePath';
+import { createTourPopupContent} from './utils/popupUtils';
+
+
 // React and Core Dependencies
 import { React, useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 // Leaflet and Map-related Dependencies
 import { MapContainer, Popup, Marker, GeoJSON, LayersControl, LayerGroup, useMap } from "react-leaflet";
 import L from 'leaflet';  // Core Leaflet library for map functionality
-import "../styling/index.css";
+import "../../styling/index.css";
 import 'leaflet.markercluster/dist/leaflet.markercluster';  // Clustering support for markers
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -40,26 +62,28 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import HomeIcon from '@mui/icons-material/Home';
 
+
 // Local Data and Styles
-import geo_burials from "../data/Geo_Burials.json";
-import ARC_Roads from "../data/ARC_Roads.json";
-import ARC_Boundary from "../data/ARC_Boundary.json";
-import ARC_Sections from "../data/ARC_Sections.json";
-import Sec75_Headstones from "../data/Projected_Sec75_Headstones.json";
-import Sec49_Headstones from "../data/Projected_Sec49_Headstones.json";
+import geo_burials from "../../data/Geo_Burials.json";
+import ARC_Roads from "../../data/ARC_Roads.json";
+import ARC_Boundary from "../../data/ARC_Boundary.json";
+import ARC_Sections from "../../data/ARC_Sections.json";
+import Sec75_Headstones from "../../data/Projected_Sec75_Headstones.json";
+import Sec49_Headstones from "../../data/Projected_Sec49_Headstones.json";
 
 // Tour Data Imports
-import NotablesTour from "../data/NotablesTour20.json";
-import IndependenceTour from "../data/IndependenceTour20.json";
-import AfricanAmericanTour from "../data/AfricanAmericanTour20.json";
-import ArtistTour from "../data/ArtistTour20.json";
-import AssociationsTour from "../data/AssociationsTour20.json";
-import AuthorsTour from "../data/AuthorsPublishersTour20.json";
-import BusinessTour from "../data/BusinessFinanceTour20.json";
-import CivilWarTour from "../data/CivilWarTour20.json";
-import PillarsTour from "../data/SocietyPillarsTour20.json";
-import MayorsTour from "../data/AlbanyMayors_fixed.json";
-import GARTour from "../data/GAR_fixed.json";
+import NotablesTour from "../../data/NotablesTour20.json";
+import IndependenceTour from "../../data/IndependenceTour20.json";
+import AfricanAmericanTour from "../../data/AfricanAmericanTour20.json";
+import ArtistTour from "../../data/ArtistTour20.json";
+import AssociationsTour from "../../data/AssociationsTour20.json";
+import AuthorsTour from "../../data/AuthorsPublishersTour20.json";
+import BusinessTour from "../../data/BusinessFinanceTour20.json";
+import CivilWarTour from "../../data/CivilWarTour20.json";
+import PillarsTour from "../../data/SocietyPillarsTour20.json";
+import MayorsTour from "../../data/AlbanyMayors_fixed.json";
+import GARTour from "../../data/GAR_fixed.json";
+
 
 //=============================================================================
 // Constants and Configuration
@@ -95,422 +119,26 @@ const MARKER_COLORS = [
  */
 const ZOOM_LEVEL = 18;
 
-/**
- * Tour definitions with associated colors and display names
- */
-const TOURS = {
-  Lot7: { name: "Soldier's Lot (Section 75, Lot 7)", color: '#7587ff' },
-  Sec49: { name: "Section 49", color: '#75ff87' },
-  Notable: { name: "Notables Tour 2020", color: '#ff7700' },
-  Indep: { name: "Independence Tour 2020", color: '#7700ff' },
-  Afr: { name: "African American Tour 2020", color: '#eedd00' },
-  Art: { name: "Artists Tour 2020", color: '#ff4277' },
-  Groups: { name: "Associations, Societies, & Groups Tour 2020", color: '#86cece' },
-  AuthPub: { name: "Authors & Publishers Tour 2020", color: '#996038' },
-  Business: { name: "Business & Finance Tour 2020", color: '#558e76' },
-  CivilWar: { name: "Civil War Tour 2020", color: '#a0a0a0' },
-  Pillars: { name: "Pillars of Society Tour 2020", color: '#d10008' },
-  MayorsOfAlbany: { name: "Mayors of Albany", color: '#ff00dd' },
-  GAR: { name: "Grand Army of the Republic", color: '#000080' }
-};
 
-//=============================================================================
-// Style Definitions
-//=============================================================================
 
-/**
- * Style configuration for the cemetery boundary
- */
-const exteriorStyle = {
-  color: "#ffffff",
-  weight: 1.5,
-  fillOpacity: .08
-};
 
-/**
- * Style configuration for cemetery roads
- */
-const roadStyle = {
-  color: '#000000',
-  weight: 2,
-  opacity: 1,
-  fillOpacity: 0.1
-};
 
 //=============================================================================
 // React Components
 //=============================================================================
 
-/**
- * Custom zoom control component that provides zoom in/out buttons
- * Positioned at the top-right corner of the map
- */
-function CustomZoomControl() {
-  const map = useMap();
-  
-  return (
-    <Paper 
-      elevation={3}
-      sx={{
-        position: 'absolute',
-        top: '80px',
-        right: '10px',
-        zIndex: 1000,
-      }}
-    >
-      <ButtonGroup
-        orientation="vertical"
-        variant="contained"
-        size="small"
-      >
-        <IconButton onClick={() => map.zoomIn()} size="small">
-          <AddIcon />
-        </IconButton>
-        <IconButton onClick={() => map.zoomOut()} size="small">
-          <RemoveIcon />
-        </IconButton>
-      </ButtonGroup>
-    </Paper>
-  );
-}
 
-/**
- * Component that restricts map bounds and zoom levels to the cemetery area
- * Uses Turf.js for geospatial calculations
- */
-function MapBounds() {
-  const map = useMap();
-  const boundaryPolygon = ARC_Boundary.features[0];
-  
-  useEffect(() => {
-    // Calculate the bounds of the boundary polygon using Turf.js
-    const bounds = turf.bbox(boundaryPolygon);
-    
-    // Add significant padding to the bounds (about 1km)
-    const padding = 0.01; // roughly 1km in decimal degrees
-    const southWest = [bounds[1] - padding, bounds[0] - padding];
-    const northEast = [bounds[3] + padding, bounds[2] + padding];
-    
-    const paddedBounds = [southWest, northEast];
-    
-    // Set map constraints
-    map.setMaxBounds(paddedBounds);
-    map.setMinZoom(13);
-    map.setMaxZoom(25);
 
-    // Initial fit to bounds
-    map.once('load', () => {
-      map.fitBounds(paddedBounds);
-    });
-  }, [map, boundaryPolygon]);
-  
-  return null;
-}
 
-/**
- * Component that renders the ESRI vector basemap
- */
-function VectorBasemap({ name }) {
-  return <BasemapLayer name={name} maxZoom={25} maxNativeZoom={19} />;
-}
 
-/**
- * Component that manages map state and provides access to the map instance
- */
-function MapController({ selectedBurials, hoveredIndex }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    // Store the map instance globally for external access
-    window.mapInstance = map;
-  }, [map]);
-  
-  return null;
-}
 
-/**
- * Button component that resets the map view to the default extent
- */
-function DefaultExtentButton() {
-  const map = useMap();
-  
-  const handleClick = () => {
-    const defaultBounds = [
-      [42.694180, -73.741980], // Southwest corner
-      [42.714180, -73.721980]  // Northeast corner
-    ];
-    map.fitBounds(defaultBounds);
-  };
-  
-  return (
-    <Paper 
-      elevation={3}
-      sx={{
-        position: 'absolute',
-        top: '150px',
-        right: '10px',
-        zIndex: 1000,
-      }}
-    >
-      <IconButton onClick={handleClick} size="small" title="Return to Default Extent">
-        <HomeIcon />
-      </IconButton>
-    </Paper>
-  );
-}
-
-/**
- * Component that manages routing between two points using GraphHopper
- */
-function RoutingControl({ from, to }) {
-  const map = useMap();
-  const [routingError, setRoutingError] = useState(null);
-  const [isCalculating, setIsCalculating] = useState(false);
-  
-  useEffect(() => {
-    if (!from || !to) return;
-
-    setRoutingError(null);
-    setIsCalculating(true);
-
-    const apiKey = process.env.REACT_APP_GRAPHHOPPER_API_KEY;
-    if (!apiKey) {
-      console.error('GraphHopper API key not found in environment variables');
-      setRoutingError('Configuration error: API key not found. Please contact administrators.');
-      setIsCalculating(false);
-      return;
-    }
-
-    const routingControl = L.Routing.control({
-      router: new L.Routing.GraphHopper(apiKey, {
-        urlParameters: {
-          vehicle: 'foot'  // Set to pedestrian routing
-        }
-      }),
-      waypoints: [
-        L.latLng(from[0], from[1]),
-        L.latLng(to[0], to[1])
-      ],
-      createMarker: function() { return null; },
-      lineOptions: {
-        styles: [
-          {color: '#0066CC', opacity: 0.8, weight: 5},
-          {color: '#ffffff', opacity: 0.3, weight: 7}
-        ]
-      },
-      addWaypoints: false,
-      draggableWaypoints: false,
-      fitSelectedRoutes: true,
-      showAlternatives: false,
-      useZoomParameter: true,
-      show: false
-    }).addTo(map);
-
-    routingControl.on('routesfound', () => {
-      setIsCalculating(false);
-    });
-
-    routingControl.on('routingerror', (e) => {
-      console.error('Routing error:', e);
-      
-      if (e.error && e.error.status === 0) {
-        setRoutingError('Network error: Please check your internet connection.');
-      } else if (e.error && e.error.status === 401) {
-        setRoutingError('Authentication error: Invalid API key.');
-      } else if (e.error && e.error.status === 429) {
-        setRoutingError('Too many requests: Rate limit exceeded.');
-      } else {
-        setRoutingError('Unable to calculate route. The locations might be inaccessible by foot or too far apart.');
-      }
-      
-      setIsCalculating(false);
-      map.removeControl(routingControl);
-    });
-
-    return () => {
-      map.removeControl(routingControl);
-    };
-  }, [map, from, to]);
-
-  if (isCalculating) {
-    return (
-      <Paper
-        elevation={3}
-        sx={{
-          position: 'absolute',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 1000,
-          padding: '10px',
-          backgroundColor: '#f5f5f5',
-          color: '#333',
-        }}
-      >
-        <Typography>Calculating route...</Typography>
-      </Paper>
-    );
-  }
-
-  if (routingError) {
-    return (
-      <Paper
-        elevation={3}
-        sx={{
-          position: 'absolute',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 1000,
-          padding: '10px',
-          backgroundColor: '#f44336',
-          color: 'white',
-        }}
-      >
-        <Typography>{routingError}</Typography>
-      </Paper>
-    );
-  }
-
-  return null;
-}
 
 //=============================================================================
 // Helper Functions
 //=============================================================================
 
-/**
- * Creates a numbered marker icon for search results
- * @param {number} number - The number to display in the marker
- * @param {boolean} isHighlighted - Whether the marker should be highlighted
- * @returns {L.DivIcon} A Leaflet div icon configured with the specified number and styling
- */
-const createNumberedIcon = (number, isHighlighted = false) => {
-  const colorIndex = (number - 1) % MARKER_COLORS.length;
-  const color = MARKER_COLORS[colorIndex];
-  
-  return L.divIcon({
-    className: 'custom-div-icon',
-    html: `
-      <div style="
-        background-color: ${color};
-        width: ${isHighlighted ? '32px' : '24px'};
-        height: ${isHighlighted ? '32px' : '24px'};
-        border-radius: 50%;
-        border: ${isHighlighted ? '3px' : '2px'} solid white;
-        box-shadow: ${isHighlighted ? '0 0 8px rgba(0,0,0,0.6)' : '0 0 4px rgba(0,0,0,0.4)'};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: ${isHighlighted ? '16px' : '14px'};
-        transition: all 0.2s ease;
-      ">
-        ${number}
-      </div>
-    `,
-    iconSize: [isHighlighted ? 32 : 24, isHighlighted ? 32 : 24],
-    iconAnchor: [isHighlighted ? 16 : 12, isHighlighted ? 16 : 12],
-    popupAnchor: [0, isHighlighted ? -16 : -12]
-  });
-};
 
-/**
- * Creates a unique key for a burial record
- * @param {Object} burial - The burial record object
- * @param {number} index - The index of the burial in the list
- * @returns {string} A unique identifier string
- */
-const createUniqueKey = (burial, index) => {
-  return `${burial.OBJECTID}_${burial.Section}_${burial.Lot}_${burial.Grave}_${index}`;
-};
 
-/**
- * Gets the image path for a burial record's photo
- * @param {string} imageName - The name of the image file
- * @returns {string} The complete URL path to the image
- */
-const getImagePath = (imageName) => {
-  if (!imageName || imageName === "NONE") return 'https://www.albany.edu/arce/images/no-image.jpg';
-  
-  if (process.env.NODE_ENV === 'development') {
-    return `http://localhost:8000/src/data/images/${imageName}`;
-  }
-  return `https://www.albany.edu/arce/images/${imageName}`;
-};
-
-/**
- * Creates a marker for a tour point
- * @param {string} tourKey - The key identifying the tour
- * @returns {Function} A function that creates a Leaflet marker or circle marker
- */
-const createTourMarker = (tourKey) => {
-  const tourInfo = TOURS[tourKey];
-  if (!tourInfo) return null;
-
-  return (feature, latlng) => {
-    if (feature.geometry.type === 'Point') {
-      const icon = L.divIcon({
-        className: 'tour-marker',
-        html: `<div style="
-          width: 12px;
-          height: 12px;
-          background-color: ${tourInfo.color};
-          border-radius: 50%;
-          border: 2px solid white;
-          box-shadow: 0 0 4px rgba(0,0,0,0.4);
-        "></div>`,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6]
-      });
-      return L.marker(latlng, { icon });
-    }
-    return L.circleMarker(latlng, {
-      radius: 6,
-      fillColor: tourInfo.color,
-      color: '#ffffff',
-      weight: 2,
-      opacity: 0.9,
-      fillOpacity: 0.7
-    });
-  };
-};
-
-/**
- * Creates HTML content for a tour point popup
- * @param {Object} feature - The GeoJSON feature containing burial information
- * @param {string} tourKey - The key identifying the tour
- * @returns {string} HTML content for the popup
- */
-const createTourPopupContent = (feature, tourKey) => {
-  let content = `<dl class="popup-content">`;
-  
-  content += `<dt><b>${feature.properties.Full_Name}</b></dt><hr>`;
-  
-  if (feature.properties.Titles) {
-    content += `<dt>${feature.properties.Titles}</dt>`;
-  }
-  
-  content += `<dt>(Click image to view detailed biography)</dt>`;
-  
-  if (feature.properties.Bio_Portra && feature.properties.Bio_Portra !== "NONE") {
-    content += `
-      <dt>
-        <a href="https://www.albany.edu/arce/${feature.properties.Tour_Bio}.html" target="_blank">
-          <img 
-            src="${getImagePath(feature.properties.Bio_Portra)}"
-            style="max-width:200px; max-height:200px; border:2px solid #ccc; border-radius:4px; margin:8px 0;"
-            loading="lazy"
-            onerror="this.onerror=null; this.src='https://www.albany.edu/arce/images/no-image.jpg';"
-          />
-        </a>
-      </dt>`;
-  }
-  
-  content += '</dl>';
-  return content;
-};
 
 /**
  * Enhanced search function that supports multiple search strategies
@@ -518,80 +146,9 @@ const createTourPopupContent = (feature, tourKey) => {
  * @param {string} searchInput - The user's search query
  * @returns {Array} Filtered array of matching burial records
  */
-const smartSearch = (options, searchInput) => {
-  const input = searchInput.toLowerCase().trim();
-  if (!input) return [];
 
-  // Year search (4 digits)
-  const yearPattern = /^\d{4}$/;
-  if (yearPattern.test(input)) {
-    return options.filter(option => 
-      (option.Birth && option.Birth.includes(input)) ||
-      (option.Death && option.Death.includes(input))
-    );
-  }
 
-  // Section search (e.g., "section 1" or "sec 1")
-  const sectionPattern = /^(section|sec)\s*([a-zA-Z0-9]+)$/i;
-  const sectionMatch = input.match(sectionPattern);
-  if (sectionMatch) {
-    const sectionQuery = sectionMatch[2];
-    return options.filter(option => 
-      option.Section && option.Section.toString().toLowerCase() === sectionQuery.toLowerCase()
-    );
-  }
-
-  // Lot search (e.g., "lot 123")
-  const lotPattern = /^lot\s*(\d+)$/i;
-  const lotMatch = input.match(lotPattern);
-  if (lotMatch) {
-    const lotQuery = lotMatch[1];
-    return options.filter(option => 
-      option.Lot && option.Lot.toString() === lotQuery
-    );
-  }
-
-  // Tour search by name (e.g., "notable tour", "civil war tour")
-  const tourPattern = /^(.*?)\s*tour$/i;
-  const tourMatch = input.match(tourPattern);
-  if (tourMatch) {
-    const tourQuery = tourMatch[1].toLowerCase();
-    return options.filter(option => {
-      if (!option.title) return false;
-      const tourName = TOURS[option.title]?.name.toLowerCase() || '';
-      return tourName.includes(tourQuery);
-    });
-  }
-
-  // Tour search by keyword
-  const tourKeywords = Object.values(TOURS).map(tour => tour.name.toLowerCase());
-  const matchesTour = tourKeywords.some(keyword => keyword.includes(input));
-  if (matchesTour) {
-    return options.filter(option => {
-      if (!option.title) return false;
-      const tourName = TOURS[option.title]?.name.toLowerCase() || '';
-      return tourName.includes(input);
-    });
-  }
-
-  // Numeric search (section, lot, or year)
-  const numberPattern = /^\d+$/;
-  if (numberPattern.test(input)) {
-    return options.filter(option => 
-      (option.Section && option.Section.toString() === input) ||
-      (option.Lot && option.Lot.toString() === input) ||
-      (option.Birth && option.Birth.includes(input)) ||
-      (option.Death && option.Death.includes(input))
-    );
-  }
-
-  // Default name search
-  return options.filter(option => {
-    const nameMatch = option.searchableLabel.toLowerCase().includes(input);
-    const tourMatch = option.title && TOURS[option.title]?.name.toLowerCase().includes(input);
-    return nameMatch || tourMatch;
-  });
-};
+  
 
 //=============================================================================
 // Data Structures
@@ -600,31 +157,14 @@ const smartSearch = (options, searchInput) => {
 /**
  * Array of unique section numbers from the burial data
  * Sorted numerically with special handling for section 100A
- */
+
 const UNIQUE_SECTIONS = Array.from(new Set(geo_burials.features.map(f => f.properties.Section))).sort((a, b) => {
   if (a === '100A') return 1;
   if (b === '100A') return -1;
   return a - b;
 });
-
-/**
- * Tour data configuration with associated GeoJSON data
  */
-const TOUR_DATA = [
-  { key: 'Lot7', data: Sec75_Headstones, name: "Soldier's Lot (Section 75, Lot 7)" },
-  { key: 'Sec49', data: Sec49_Headstones, name: "Section 49" },
-  { key: 'Notable', data: NotablesTour, name: "Notables Tour 2020" },
-  { key: 'Indep', data: IndependenceTour, name: "Independence Tour 2020" },
-  { key: 'Afr', data: AfricanAmericanTour, name: "African American Tour 2020" },
-  { key: 'Art', data: ArtistTour, name: "Artists Tour 2020" },
-  { key: 'Groups', data: AssociationsTour, name: "Associations, Societies, & Groups Tour 2020" },
-  { key: 'AuthPub', data: AuthorsTour, name: "Authors & Publishers Tour 2020" },
-  { key: 'Business', data: BusinessTour, name: "Business & Finance Tour 2020" },
-  { key: 'CivilWar', data: CivilWarTour, name: "Civil War Tour 2020" },
-  { key: 'Pillars', data: PillarsTour, name: "Pillars of Society Tour 2020" },
-  { key: 'MayorsOfAlbany', data: MayorsTour, name: "Mayors of Albany" },
-  { key: 'GAR', data: GARTour, name: "Grand Army of the Republic" }
-];
+
 
 /**
  * Default style for burial markers
@@ -642,91 +182,10 @@ const markerStyle = {
 // Tour Components
 //=============================================================================
 
-/**
- * Component for filtering and selecting cemetery tours
- */
-function TourFilter({ overlayMaps, setShowAllBurials, onTourSelect }) {
-  return (
-    <Autocomplete
-      options={TOUR_DATA}
-      getOptionLabel={(option) => option.name}
-      onChange={(event, newValue) => {
-        setShowAllBurials(true);
-        const tourName = newValue ? newValue.name : null;
-        onTourSelect(tourName);
-      }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Tour"
-          size="small"
-          fullWidth
-        />
-      )}
-      renderOption={(props, option) => (
-        <li {...props}>
-          <Box
-            component="span"
-            sx={{
-              width: 14,
-              height: 14,
-              mr: 1,
-              borderRadius: '50%',
-              backgroundColor: TOURS[option.key].color,
-              display: 'inline-block'
-            }}
-          />
-          {option.name}
-        </li>
-      )}
-    />
-  );
-}
 
-/**
- * Component that manages the visibility of tour layers on the map
- */
-function MapTourController({ selectedTour, overlayMaps }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (!map || !overlayMaps) return;
 
-    // Remove all tour layers first
-    TOUR_DATA.forEach(({ name }) => {
-      const layer = overlayMaps[name];
-      if (layer) {
-        map.removeLayer(layer);
-      }
-    });
 
-    // Add only the selected tour layer if it exists
-    if (selectedTour) {
-      const layer = overlayMaps[selectedTour];
-      if (layer) {
-        map.addLayer(layer);
-      }
-    }
-  }, [map, selectedTour, overlayMaps]);
-  
-  return null;
-}
 
-/**
- * Creates event handlers for tour features
- * @param {string} tourKey - The key identifying the tour
- * @returns {Function} Event handler for the tour feature
- */
-const createOnEachTourFeature = (tourKey) => (feature, layer) => {
-  if (feature.properties && feature.properties.Full_Name) {
-    const content = createTourPopupContent(feature, tourKey);
-    layer.bindPopup(content, {
-      maxWidth: 300,
-      className: 'custom-popup'
-    });
-    feature.properties.title = tourKey;
-  }
-};
 
 //=============================================================================
 // Main Map Component

@@ -26,7 +26,7 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'lrm-graphhopper';  // GraphHopper routing integration
 import * as turf from '@turf/turf';  // Geospatial calculations library
 import { BasemapLayer } from 'react-esri-leaflet';  // ESRI basemap integration
-import ToursLayer from "./ToursLayer";
+import TourGroup from "./Tour_Group";
 // Material-UI Components and Icons
 import { 
   Autocomplete, TextField, Paper, InputAdornment, IconButton,
@@ -61,6 +61,7 @@ import CivilWarTour from "../data/CivilWarTour20.json";
 import PillarsTour from "../data/SocietyPillarsTour20.json";
 import MayorsTour from "../data/AlbanyMayors_fixed.json";
 import GARTour from "../data/GAR_fixed.json";
+import Lot7 from "../data/Projected_Sec75_Headstones.json"
 
 //=============================================================================
 // Constants and Configuration
@@ -130,6 +131,7 @@ const sectionBoundaryStyle = {
   weight: 1.5,
   fillOpacity: 0.2
 }
+
 /**
  * Style configuration for cemetery roads
  */
@@ -529,6 +531,10 @@ export default function ToursMap() {
               });
             }}
             />
+            <TourGroup data={CivilWarTour} color="#a0a0a0" name="Civil War Tour 2020"/>
+            <TourGroup data={Lot7} color="#7587ff" name="Soldiers Lot (Section 75, Lot 7)"/>
+            {/* <TourGroup data={CivilWarTour} color="#a0a0a0" name="Civil War Tour 2020"/>
+            <TourGroup data={CivilWarTour} color="#a0a0a0" name="Civil War Tour 2020"/> */}
           </LayersControl.Overlay>
         </LayerGroup>
 

@@ -13,4 +13,8 @@ const TOURS = {
   MayorsOfAlbany: { name: "Mayors of Albany", color: '#ff00dd' },
   GAR: { name: "Grand Army of the Republic", color: '#000080' }
 };
+const TOUR_DATA = Object.entries(TOURS).map(([key, value]) => ({
+  key,
+  ...value
+}));
 

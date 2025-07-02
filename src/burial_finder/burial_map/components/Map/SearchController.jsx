@@ -5,11 +5,11 @@
 
 import React, { useCallback, useState } from 'react';
 import * as turf from '@turf/turf' 
-/*
-import { ARC_Boundary } from '../../../data/Burials.gdb/ARC_Boundary';
-import { smartSearch } from './utils/searchUtils'; 
-*/
-const ZOOM_LEVEL = 16;
+import ARC_Boundary from '../../../../data/ARC_Boundary.json';
+import { smartSearch } from '../../utils/searchUtils';
+import { ZOOM_LEVEL } from '../../constants'; // Import the ZOOM_LEVEL constant
+
+
 
 const SearchController = () => {
   const [status, setStatus] = useState('');

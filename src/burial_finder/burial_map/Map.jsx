@@ -12,16 +12,15 @@
 //=============================================================================
 
 
-import ZoomControl from './components/Map/ZoomControl';
+import CustomZoomControl from './components/Map/ZoomControl';
 import {DefaultExtentButton}from './components/Map/DefaultExtentButton';
 import MapBounds from './components/Map/MapBounds';
 import RoutingControl from './components/Map/RoutingControl';
 import VectorBasemap from './components/Map/VectorBasemap';
 import {createOnEachTourFeature} from './components/Map/ResultMarker';
 import MapController from './components/Map/MapController';
-import CustomZoomControl from './components/Map/ZoomControl'; 
 import { TourFilter } from './components/Map/TourFilter';
-import { SearchController } from './components/Map/SearchController';
+import  SearchController from './components/Map/SearchController';
 
 
 import { createMarkeIcon, createNumberedIcon} from './utils/markerUtils';
@@ -31,6 +30,10 @@ import TOUR_DATA from './utils/tourConfig';
 import { UNIQUE_SECTIONS } from './utils/mapUtils'; 
 import { getImagePath } from './utils/getImagePath';
 import { createTourPopupContent} from './utils/popupUtils';
+import {createTourMarker} from './utils/createTourMarker';
+import {createUniqueKey} from './utils/createUniqueKey';
+import MapTourController from './components/Map/MapTourController';
+import { exteriorStyle, roadStyle } from './utils/mapUtils';
 
 
 // React and Core Dependencies

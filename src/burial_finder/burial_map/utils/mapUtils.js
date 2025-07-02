@@ -1,3 +1,7 @@
+import  geo_burials  from '../../../data/Geo_Burials.json';
+import { createTourPopupContent } from './popupUtils';
+
+
 /**
  * Array of unique section numbers from the burial data
  * Sorted numerically with special handling for section 100A
@@ -23,3 +27,19 @@ const createOnEachTourFeature = (tourKey) => (feature, layer) => {
   }
 }; 
 export { UNIQUE_SECTIONS, createOnEachTourFeature };
+
+export const exteriorStyle = {
+  color: '#000',
+  weight: 1,
+  opacity: 0.5,
+  fillOpacity: 0.1,
+  fillColor: '#000',
+};
+
+export const roadStyle = {
+  color: '#000',
+  weight: 1,
+  opacity: 0.5,
+  fillOpacity: 0.1,
+  fillColor: '#000',
+}; 

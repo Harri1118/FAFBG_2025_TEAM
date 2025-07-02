@@ -1,3 +1,8 @@
+import React, { useEffect } from 'react';
+import { useMap } from 'react-leaflet';
+import { TOUR_DATA } from '../../utils/tourConfig';
+
+
 /**
  * Component that manages the visibility of tour layers on the map
  */
@@ -26,4 +31,4 @@ function MapTourController({ selectedTour, overlayMaps }) {
   
   return null;
 }
-export const MapTourController;
+export default MapTourController;

@@ -15,3 +15,4 @@ export const createUniqueKey = (burial, index) => {
   
   // Append index to ensure uniqueness in case of duplicate OBJECTIDs
   return `${baseKey}-${index}`;
+}; 

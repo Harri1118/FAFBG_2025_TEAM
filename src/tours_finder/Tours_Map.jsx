@@ -503,19 +503,19 @@ export default function ToursMap() {
           </LayerGroup>
         <LayerGroup>
 
-            <TourGroup data={Lot7} color="#7587ff" name="Soldiers Lot (Section 75, Lot 7)"/>
-            <TourGroup data={Sec49_Headstones} color="#75ff87" name="Mayors of Albany"/>
-            <TourGroup data={NotablesTour} color="#ff7700" name="Notables Tour 2020"/>
-            <TourGroup data={IndependenceTour} color="#7700ff" name="Independence Tour 2020"/>
-            <TourGroup data={AfricanAmericanTour} color="#eedd00" name="African American Tour 2020"/>
-            <TourGroup data={ArtistTour} color="#ff4277" name="Artists Tour 2020"/>
-            <TourGroup data={AssociationsTour} color="#86cece" name="Associations, Societies, & Groups Tour 2020"/>
-            <TourGroup data={AuthorsTour} color="#996038" name="Authors & Publishers Tour 2020"/> 
-            <TourGroup data={BusinessTour} color="#558e76" name="Business & Finance Tour 2020"/> 
-            <TourGroup data={CivilWarTour} color="#a0a0a0" name="Civil War Tour 2020"/>
-            <TourGroup data={PillarsTour} color="#d10008" name="Pillars of Society Tour 2020"/>
-            <TourGroup data={MayorsTour} color="#ff00dd" name="Mayors of Albany"/>
-            <TourGroup data={GARTour} color="#000080" name="Grand Army of the Republic"/>
+            <TourGroup data={Lot7} color="#7587ff" tourGroup="Soldiers Lot (Section 75, Lot 7)"/>
+            <TourGroup data={Sec49_Headstones} color="#75ff87" tourGroup="Mayors of Albany"/>
+            <TourGroup data={NotablesTour} color="#ff7700" tourGroup="Notables Tour 2020"/>
+            <TourGroup data={IndependenceTour} color="#7700ff" tourGroup="Independence Tour 2020"/>
+            <TourGroup data={AfricanAmericanTour} color="#eedd00" tourGroup="African American Tour 2020"/>
+            <TourGroup data={ArtistTour} color="#ff4277" tourGroup="Artists Tour 2020"/>
+            <TourGroup data={AssociationsTour} color="#86cece" tourGroup="Associations, Societies, & Groups Tour 2020"/>
+            <TourGroup data={AuthorsTour} color="#996038" tourGroup="Authors & Publishers Tour 2020"/> 
+            <TourGroup data={BusinessTour} color="#558e76" tourGroup="Business & Finance Tour 2020"/> 
+            <TourGroup data={CivilWarTour} color="#a0a0a0" tourGroup="Civil War Tour 2020"/>
+            <TourGroup data={PillarsTour} color="#d10008" tourGroup="Pillars of Society Tour 2020"/>
+            <TourGroup data={MayorsTour} color="#ff00dd" tourGroup="Mayors of Albany"/>
+            <TourGroup data={GARTour} color="#000080" tourGroup="Grand Army of the Republic"/>
             <LayersControl.Overlay name="Sections">
             <GeoJSON data={ARC_Sections} style={sectionBoundaryStyle}
             onEachFeature={(feature, layer) => {

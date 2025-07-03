@@ -22,12 +22,15 @@ const Tour_Group = ({ data, color, tourGroup }) => {
         const Full_Name = feature.properties.Full_Name
         const Birth = feature.properties.Birth || "Unknown"
         const Death = feature.properties.Death || "Unknown"
+        const HeadStone = feature.properties.Headstone_
         const InitialTerm = feature.properties.Initial_Te;
         const SubsequentTerm = feature.properties.Subsequent;
         const Section = feature.properties.Section;
         const Lot = feature.properties.Lot;
-        const ShortBio = feature.properties.Titles
+        let ShortBio = feature.properties.Titles
         let Image_Name = feature.properties.Bio_Portri;
+        if(ShortBio == null)
+          ShortBio = feature.properties.Service_Re
         if(Image_Name == null || Image_Name == "null")
           Image_Name = feature.properties.Bio_Portra
         let popupContent = `
@@ -42,10 +45,13 @@ const Tour_Group = ({ data, color, tourGroup }) => {
         if(SubsequentTerm != null)
         popupContent += `<div><strong>Subsequent Term:</strong> ${SubsequentTerm}</div>`
     
-          const birthDeathSection = `
+          let birthDeathSection = `
         <div><strong>Date of birth:</strong> ${Birth}</div>
-        <div><strong>Date of death:</strong> ${Death}</div>
+        <div><strong>Date of death:</strong> ${Death}
         `
+         if(HeadStone != null)
+           birthDeathSection += ` : Headstone: ${HeadStone}`
+        birthDeathSection += `</div>`
         if(Birth != "Unknown" || Death != "Unknown")
           popupContent = popupContent + birthDeathSection;
         if(Image_Name != null)

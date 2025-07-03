@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import L from 'leaflet';
 import { LayerGroup, LayersControl, GeoJSON } from 'react-leaflet';
-import CivilWarTour from "../data/CivilWarTour20.json";
 
 const Tour_Group = ({ data, color, name }) => {
   const pointStyle = {

@@ -490,18 +490,33 @@ export default function ToursMap() {
           <BaseLayer name="Imagery">
             <VectorBasemap name="ImageryClarity" />
           </BaseLayer>
-          <LayerGroup>
-            <LayersControl.Overlay name="Roads">
-              <GeoJSON data={ARC_Roads} style={roadStyle} />
-            </LayersControl.Overlay>
-          </LayerGroup>
+
           <LayerGroup>
             <LayersControl.Overlay checked name="Boundary">
               <GeoJSON data={ARC_Boundary} style={exteriorStyle}/>
             </LayersControl.Overlay>
           </LayerGroup>
+          <LayerGroup>
+            <LayersControl.Overlay name="Roads">
+              <GeoJSON data={ARC_Roads} style={roadStyle} />
+            </LayersControl.Overlay>
+          </LayerGroup>
         <LayerGroup>
-          <LayersControl.Overlay name="Sections">
+
+            <TourGroup data={Lot7} color="#7587ff" name="Soldiers Lot (Section 75, Lot 7)"/>
+            <TourGroup data={Sec49_Headstones} color="#75ff87" name="Mayors of Albany"/>
+            <TourGroup data={NotablesTour} color="#ff7700" name="Notables Tour 2020"/>
+            <TourGroup data={IndependenceTour} color="#7700ff" name="Independence Tour 2020"/>
+            <TourGroup data={AfricanAmericanTour} color="#eedd00" name="African American Tour 2020"/>
+            <TourGroup data={ArtistTour} color="#ff4277" name="Artists Tour 2020"/>
+            <TourGroup data={AssociationsTour} color="#86cece" name="Associations, Societies, & Groups Tour 2020"/>
+            <TourGroup data={AuthorsTour} color="#996038" name="Authors & Publishers Tour 2020"/> 
+            <TourGroup data={BusinessTour} color="#558e76" name="Business & Finance Tour 2020"/> 
+            <TourGroup data={CivilWarTour} color="#a0a0a0" name="Civil War Tour 2020"/>
+            <TourGroup data={PillarsTour} color="#d10008" name="Pillars of Society Tour 2020"/>
+            <TourGroup data={MayorsTour} color="#ff00dd" name="Mayors of Albany"/>
+            <TourGroup data={GARTour} color="#000080" name="Grand Army of the Republic"/>
+            <LayersControl.Overlay name="Sections">
             <GeoJSON data={ARC_Sections} style={sectionBoundaryStyle}
             onEachFeature={(feature, layer) => {
               // Create tooltip but don't bind it yet
@@ -531,11 +546,7 @@ export default function ToursMap() {
               });
             }}
             />
-            <TourGroup data={CivilWarTour} color="#a0a0a0" name="Civil War Tour 2020"/>
-            <TourGroup data={Lot7} color="#7587ff" name="Soldiers Lot (Section 75, Lot 7)"/>
-            {/* <TourGroup data={CivilWarTour} color="#a0a0a0" name="Civil War Tour 2020"/>
-            <TourGroup data={CivilWarTour} color="#a0a0a0" name="Civil War Tour 2020"/> */}
-          </LayersControl.Overlay>
+            </LayersControl.Overlay>
         </LayerGroup>
 
            

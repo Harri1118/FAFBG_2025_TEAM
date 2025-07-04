@@ -29,6 +29,7 @@ const Tour_Group = ({ data, color, tourGroup }) => {
         const Lot = feature.properties.Lot;
         let ShortBio = feature.properties.Titles
         let Image_Name = feature.properties.Bio_Portri;
+        const Link = feature.properties.Tour_Bio;
         if(ShortBio == null)
           ShortBio = feature.properties.Service_Re
         if(Image_Name == null || Image_Name == "null")
@@ -54,9 +55,10 @@ const Tour_Group = ({ data, color, tourGroup }) => {
         birthDeathSection += `</div>`
         if(Birth != "Unknown" || Death != "Unknown")
           popupContent = popupContent + birthDeathSection;
+        popupContent = popupContent +  `<a href="https://www.albany.edu/arce/${Link}.html" target="blank_" style="color: black;">`
         if(Image_Name != null)
           popupContent += `<img src="https://www.albany.edu/arce/images/${Image_Name}" alt="${Full_Name}" style="width: 100%; height: auto; border-radius: 4px;" />`
-        popupContent = popupContent + `</div>`;
+        popupContent = popupContent + `(Click here to view page)</a></div>`;
         layer.bindPopup(popupContent, {
           className: 'custom-popup'
         });

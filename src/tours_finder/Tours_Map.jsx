@@ -27,6 +27,7 @@ import 'lrm-graphhopper';  // GraphHopper routing integration
 import * as turf from '@turf/turf';  // Geospatial calculations library
 import { BasemapLayer } from 'react-esri-leaflet';  // ESRI basemap integration
 import TourGroup from "./Tour_Group";
+import ToursGroupIterative from "./Tour_Group_Sec49"
 // Material-UI Components and Icons
 import { 
   Autocomplete, TextField, Paper, InputAdornment, IconButton,
@@ -62,6 +63,7 @@ import PillarsTour from "../data/SocietyPillarsTour20.json";
 import MayorsTour from "../data/AlbanyMayors_fixed.json";
 import GARTour from "../data/GAR_fixed.json";
 import Lot7 from "../data/Projected_Sec75_Headstones.json"
+import Tour_Group_Iterative from "./Tour_Group_Sec49";
 
 //=============================================================================
 // Constants and Configuration
@@ -504,7 +506,8 @@ export default function ToursMap() {
         <LayerGroup>
 
             <TourGroup data={Lot7} color="#7587ff" tourGroup="Soldiers Lot (Section 75, Lot 7)"/>
-            <TourGroup data={Sec49_Headstones} color="#75ff87" tourGroup="Mayors of Albany"/>
+            {/* <TourGroup data={Sec49_Headstones} color="#75ff87" tourGroup="Mayors of Albany"/> */}
+            <ToursGroupIterative/>
             <TourGroup data={NotablesTour} color="#ff7700" tourGroup="Notables Tour 2020"/>
             <TourGroup data={IndependenceTour} color="#7700ff" tourGroup="Independence Tour 2020"/>
             <TourGroup data={AfricanAmericanTour} color="#eedd00" tourGroup="African American Tour 2020"/>

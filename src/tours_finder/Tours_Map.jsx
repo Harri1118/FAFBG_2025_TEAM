@@ -65,6 +65,7 @@ import GARTour from "../data/GAR_fixed.json";
 import Lot7 from "../data/Projected_Sec75_Headstones.json"
 import Tour_Group_Iterative from "./Tour_Group_Sec49";
 
+import Modal from "./WebModal"
 //=============================================================================
 // Constants and Configuration
 //=============================================================================

@@ -6,11 +6,8 @@ import ToursMap from './tours_finder/Tours_Map'
 import WebModal from './tours_finder/WebModal'
 function App() {
   return (
-    // <ToursMap/>
+    <ToursMap/>
     // <BurialMap/>
-    <div>
-      <WebModal link="https://www.google.com/"/>
-    </div>
   );
 }
 

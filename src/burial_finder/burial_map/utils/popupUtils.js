@@ -1,4 +1,5 @@
 
+import { getImagePath } from './getImagePath';
 
 export const createIndepthpop = (feature, tourKey) => {
   let content = `<dl class="popup-content">`;

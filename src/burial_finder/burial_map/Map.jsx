@@ -37,6 +37,9 @@ import { ZOOM_LEVELS, MARKER_COLORS, ZOOM_LEVEL, markerStyle } from './utils/map
 
 import { createClusterGroup } from './utils/clusterUtils';
 import { createTourPopupContent } from './utils/tourConfig';
+import { makeOverlayMaps } from './utils/layers';
+import { injectCustomStyles } from './utils/mapCustomStyle';
+import {SearchResultsMarkers} from './components/Map/searchFilter';
 
 import useSearchOptions from './hooks/searchOptions';
 
@@ -92,7 +95,8 @@ import CivilWarTour from "../../data/CivilWarTour20.json";
 import PillarsTour from "../../data/SocietyPillarsTour20.json";
 import MayorsTour from "../../data/AlbanyMayors_fixed.json";
 import GARTour from "../../data/GAR_fixed.json";
-import injectCustomStyles from './utils/mapCustomStyle';
+
+import { SignalCellularConnectedNoInternet0BarSharp } from '@mui/icons-material';
 
 
 
@@ -497,7 +501,7 @@ export default function BurialMap() {
         useEffect(() => {
           try {
             const newTourLayers = TOUR_DATA.reduce((acc, { key, data }) => {  
-              const tourLayer = L.geoJSON(data, {
+              acc[key] = L.geoJSON(data, {
                 constant, OverlayMaps = combineOverlayMaps(TOUR_DATA, newTourLayers, otherLayers),
                 setOverlayMaps(newOverlayMaps){
 
@@ -521,7 +525,214 @@ export default function BurialMap() {
               </IconButton>
             )}
           </Box>
+              
+          /* Initialize GeoJSON layers and overlay maps
+   */
+  useEffect(() => {
+    try {
+
+      const maps = makeOverlayMaps(tourCallbacks, onEachSection, createTourMarker, TOUR_DATA);
+      setOverlayMaps(maps);
+    } catch (error) {
+      console.error('Error loading GeoJSON data:', error);
+    }
+  }, [tourCallbacks, onEachSection]);
+
+    }
+      setOverlayMaps(newOverlayMaps);
+    } catch (error) {
+      console.error('Error loading GeoJSON data:', error);
+    }
+  }, [tourCallbacks, onEachSection]);
+
+  return (
+    <div className="map-container">
+      {/* Left sidebar with search and filters */}
+      <Paper 
+        elevation={3}
+        className="left-sidebar"
+      >
+        <Box sx={{ p: 2 }}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+
+          </Box>
+
+           <SearchBar 
+              searchOptions={searchOptions}
+              handleSearch={handleSearch}
+              currentSelection={currentSelection}
+              setCurrentSelection={setCurrentSelection}
+              inputValue={inputValue} 
+              renderOption={(props, option) => (
+                <li {...props} key={option.key}>
+                  <Box sx={{ width: '100%' }}>
+                   <div>
+                    {option.First_Name} {option.Last_Name}
+                    </div>
+                    </li>
+                    )}
+           />
+                  ),
+                  }}
+                />
+              )}
+              filterOptions={(options, { inputValue }) => {
+                return smartSearch(options, inputValue).slice(0, 100);
+              }}
+             
+            {currentSelection && (
+              <IconButton 
+                onClick={() => addToResults(currentSelection)}
+                color="primary"
+                size="small"
+                sx={{ alignSelf: 'center' }}
+              >
+                <AddIcon />
+              </IconButton>
+            )}
+          </Box>
           
+          {/* Section Filter */}
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Filter by Section
+            </Typography>
+            <Autocomplete
+              options={UNIQUE_SECTIONS}
+              value={sectionFilter || null}
+              onChange={(event, newValue) => {
+                setSectionFilter(newValue || '');
+                if (newValue && !showAllBurials) {
+                  setShowAllBurials(true);
+                }
+                if (newValue && window.mapInstance) {
+                  // Find the section in ARC_Sections and zoom to it
+                  const section = ARC_Sections.features.find(f => f.properties.Section === newValue);
+                  if (section) {
+                    const layer = L.geoJSON(section);
+                    const bounds = layer.getBounds();
+                    window.mapInstance.fitBounds(bounds, {
+                      padding: [50, 50],
+                      maxZoom: ZOOM_LEVELS.CLUSTER
+                    });
+                  }
+                }
+              }}
+              <Box sx={{ p: 2 }}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Autocomplete
+              freeSolo
+              options={searchOptions}
+              getOptionLabel={(option) => {
+                if (typeof option === 'string') {
+                  return option;
+                }
+                return option.searchableLabel || '';
+              }}
+              onChange={handleSearch}
+              value={currentSelection || null}
+              inputValue={inputValue}
+              onInputChange={(event, newInputValue, reason) => {
+                setInputValue(newInputValue);
+                if (reason === 'clear') {
+                  setCurrentSelection(null);
+                }
+              }}
+              sx={{ flex: 1 }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Search by name, year, section, tour..."
+                  variant="outlined"
+                  size="small"
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+              renderOption={(props, option) => (
+                <li {...props} key={option.key}>
+                  <Box sx={{ width: '100%' }}>
+                    <Typography variant="body1">
+                      {option.First_Name} {option.Last_Name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Section {option.Section}, Lot {option.Lot}
+                        {option.Birth && ` • Born ${option.Birth}`}
+                        {option.Death && ` • Died ${option.Death}`}
+                      </Typography>
+                      {option.title && (
+                        <Typography 
+                          variant="body2"
+                          sx={{
+                            color: 'white',
+                            backgroundColor: TOURS[option.title]?.color || 'grey',
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 1,
+                            fontSize: '0.75rem',
+                            whiteSpace: 'nowrap',
+                            ml: 'auto'
+                          }}
+                        >
+                          {TOURS[option.title]?.name || option.title}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                </li>
+              )}
+            /></Box> 
+            /* Section Filter */
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="subtitle2" gutterBottom>
+                          Filter by Section
+                        </Typography>
+                        <Autocomplete
+                          options={UNIQUE_SECTIONS}
+                          value={sectionFilter || null}
+                          onChange={(event, newValue) => {
+                            setSectionFilter(newValue || '');
+                            if (newValue && !showAllBurials) {
+                              setShowAllBurials(true);
+                            }
+                            if (newValue && window.mapInstance) {
+                              // Find the section in ARC_Sections and zoom to it
+                              const section = ARC_Sections.features.find(f => f.properties.Section === newValue);
+                              if (section) {
+                                const layer = L.geoJSON(section);
+                                const bounds = layer.getBounds();
+                                window.mapInstance.fitBounds(bounds, {
+                                  padding: [50, 50],
+                                  maxZoom: ZOOM_LEVELS.CLUSTER
+                                });
+                              }
+                            }
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Section"
+                              size="small"
+                              fullWidth
+                            />
+                          )}
+                          renderOption={(props, option) => (
+                            <li {...props}>
+                              Section {option}
+                            </li>
+                          )}
+                          getOptionLabel={(option) => `Section ${option}`}
+                          isOptionEqualToValue={(option, value) => option === value}
+                        />
+                      </Box>
+
           {selectedBurials.length > 0 && (
 
           {/* Show All Burials Toggle - Only show when a section is selected */}
@@ -848,44 +1059,23 @@ export default function BurialMap() {
             />
           )}
           
-          {/* Search Result Markers - Always on top */}
-          {selectedBurials.map((burial, index) => (
-            <Marker 
-              key={createUniqueKey(burial, index)}
-              position={[burial.coordinates[1], burial.coordinates[0]]}
-              icon={createNumberedIcon(index + 1, hoveredIndex === index)}
-              eventHandlers={{
-                mouseover: () => setHoveredIndex(index),
-                mouseout: () => setHoveredIndex(null),
-                click: () => handleMarkerClick(burial, index)
-              }}
-              zIndexOffset={1000}
-            >
-              <Popup>
-                <div>
-                  <h3>{burial.First_Name} {burial.Last_Name}</h3>
-                  <p>Section: {burial.Section}</p>
-                  <p>Lot: {burial.Lot}</p>
-                  <p>Tier: {burial.Tier}</p>
-                  <p>Grave: {burial.Grave}</p>
-                  <p>Birth: {burial.Birth}</p>
-                  <p>Death: {burial.Death}</p>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    fullWidth
-                    onClick={() => routingDestination ? stopRouting() : startRouting(burial)}
-                    sx={{ mt: 1 }}
-                  >
-                    {routingDestination ? 'Stop Navigation' : 'Get Directions'}
-                  </Button>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          
+          <SearchResultsMarkers
+            selectedBurials={selectedBurials}
+            onMarkerClick={handleMarkerClick}
+            onAddToResults={addToResults}
+            onRemoveFromResults={removeFromResults}
+            markerStyle={markerStyle}
+            createTourMarker={createTourMarker}
+              startRouting={startRouting}
+              handleMarkerClick={handleMarkerClick}
+              setHoveredIndex={setHoveredIndex}
+              createUniqueKey={createUniqueKey}
+              routingDestination={routingDestination}
+
+          />
+            
         </LayersControl>
       </MapContainer>
     </div>
   );
-}

@@ -4,6 +4,12 @@
  * @param {string} searchInput - The user's search query
  * @returns {Array} Filtered array of matching burial records
  */
+
+import { useCallback } from "react";
+import L from "leaflet"
+import { TOURS } from './tourConfig';
+
+const ZOOM_LEVEL = 18;
 /**
    * Handles search input and selection
    */

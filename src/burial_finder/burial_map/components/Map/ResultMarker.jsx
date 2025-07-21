@@ -1,3 +1,4 @@
+import { createTourPopupContent} from '../../utils/popupUtils';
 const createOnEachTourFeature = (tourKey) => (feature, layer) => {
   if (feature.properties && feature.properties.Full_Name) {
     const content = createTourPopupContent(feature, tourKey);

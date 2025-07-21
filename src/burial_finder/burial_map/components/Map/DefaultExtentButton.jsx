@@ -2,6 +2,10 @@
 /**
  * Button component that resets the map view to the default extent
  */
+
+import { IconButton, Paper} from "@mui/material";
+import { useMap } from "react-leaflet";
+import HomeIcon from '@mui/icons-material/Home';
  
 function DefaultExtentButton() {
   const map = useMap();

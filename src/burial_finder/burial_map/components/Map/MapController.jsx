@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { useMap } from "react-leaflet";
+
 /**
  * Component that manages map state and provides access to the map instance
  */

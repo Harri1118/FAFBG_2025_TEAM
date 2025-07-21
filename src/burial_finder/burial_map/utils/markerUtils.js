@@ -1,4 +1,20 @@
+import L from "leaflet"
 const createNumberedIcon = (number, isHighlighted = false) => {
+  /**
+ * Colors used for numbered markers in search results
+ * Cycles through these colors for multiple markers
+ */
+const MARKER_COLORS = [
+  '#e41a1c', // red
+  '#377eb8', // blue
+  '#4daf4a', // green
+  '#984ea3', // purple
+  '#ff7f00', // orange
+  '#ffff33', // yellow
+  '#a65628', // brown
+  '#f781bf', // pink
+  '#999999'  // grey
+];
   const colorIndex = (number - 1) % MARKER_COLORS.length;
   const color = MARKER_COLORS[colorIndex];
   

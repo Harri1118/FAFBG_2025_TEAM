@@ -1,3 +1,5 @@
+import { useMap } from "react-leaflet";
+import { BasemapLayer } from "react-esri-leaflet";
 /**
  * Component that renders the ESRI vector basemap
  */

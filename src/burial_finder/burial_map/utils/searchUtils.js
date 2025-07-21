@@ -1,3 +1,5 @@
+import L from 'leaflet';
+import { TOURS } from './tourConfig'; 
 /**
  * Enhanced search function that supports multiple search strategies
  * @param {Array} options - Array of searchable burial records
@@ -7,7 +9,8 @@
 /**
    * Handles search input and selection
    */
-  const handleSearch = useCallback((event, value) => {
+  const ZOOM_LEVEL = 16; // Define a zoom level constant
+  const handleSearch = (event, value, searchOptions, addToResults) => {
     if (value) {
       if (typeof value === 'string') {
         const matches = smartSearch(searchOptions, value);
@@ -18,28 +21,28 @@
         addToResults(value);
       }
     }
-  }, [searchOptions, addToResults]);
+  };
 
   /**
    * Removes a burial from search results
    */
-  const removeFromResults = useCallback((objectId) => {
+  const removeFromResults = (objectId, setSelectedBurials) => {
     setSelectedBurials(prev => prev.filter(burial => burial.OBJECTID !== objectId));
-  }, []);
+  };
 
   /**
    * Clears all search results
    */
-  const clearSearch = useCallback(() => {
+  const clearSearch = (setSelectedBurials, setInputValue, setCurrentSelection) => {
     setSelectedBurials([]);
     setInputValue('');
     setCurrentSelection(null);
-  }, []);
+  };
 
   /**
    * Handles clicking on a search result item
    */
-  const handleResultClick = useCallback((burial, index) => {
+  const handleResultClick = (burial, index) => {
     if (window.mapInstance) {
       const map = window.mapInstance;
       map.flyTo(
@@ -51,24 +54,24 @@
         }
       );
     }
-  }, []);
+  };
 
   /**
    * Handles clicking on a marker
    */
-  const handleMarkerClick = useCallback((burial, index) => {
+  const handleMarkerClick = (burial, index) => {
     if (window.mapInstance) {
       const map = window.mapInstance;
       map.panTo([burial.coordinates[1], burial.coordinates[0]], {
         duration: 1.5
       });
     }
-  }, []);
+  };
 
   /**
    * Creates a marker cluster group with custom styling
    */
-  const createClusterGroup = useCallback(() => {
+  const createClusterGroup = () => {
     return L.markerClusterGroup({
       maxClusterRadius: 70,
       disableClusteringAtZoom: 21,
@@ -97,16 +100,7 @@
         });
       }
     });
-  }, []);
-
-  export {handleSearch, removeFromResults, clearSearch, handleResultClick, handleMarkerClick, createClusterGroup};   
-
-  /**
- * Enhanced search function that supports multiple search strategies
- * @param {Array} options - Array of searchable burial records
- * @param {string} searchInput - The user's search query
- * @returns {Array} Filtered array of matching burial records
- */
+  };
 
 const smartSearch = (options, searchInput) => {
   const input = searchInput.toLowerCase().trim();
@@ -182,5 +176,14 @@ const smartSearch = (options, searchInput) => {
     return nameMatch || tourMatch;
   });
 };
-export { smartSearch };
+export { 
+  smartSearch,
+  handleSearch,
+  removeFromResults,
+  clearSearch,
+  handleResultClick,
+  handleMarkerClick,
+  createClusterGroup,
+  ZOOM_LEVEL
+};
 

@@ -1,4 +1,7 @@
-
+import { useMap } from "react-leaflet";
+import { Paper } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import HomeIcon from "@mui/icons-material/Home";
 /**
  * Button component that resets the map view to the default extent
  */

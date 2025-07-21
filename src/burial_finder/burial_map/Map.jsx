@@ -25,19 +25,25 @@ import  SearchController from './components/Map/SearchController';
 
 import { createMarkeIcon, createNumberedIcon} from './utils/markerUtils';
 import { smartSearch } from './utils/searchUtils';
-import { TOURS } from './utils/tourConfig';
-import TOUR_DATA from './utils/tourConfig';
+import { TOURS, TOUR_DATA} from './utils/tourConfig';
 import { UNIQUE_SECTIONS } from './utils/mapUtils'; 
 import { getImagePath } from './utils/getImagePath';
-import { createTourPopupContent} from './utils/popupUtils';
+import { createIndepthpop} from './utils/popupUtils';
 import {createTourMarker} from './utils/createTourMarker';
 import {createUniqueKey} from './utils/createUniqueKey';
 import MapTourController from './components/Map/MapTourController';
 import { exteriorStyle, roadStyle } from './utils/mapUtils';
+import { ZOOM_LEVELS, MARKER_COLORS, ZOOM_LEVEL, markerStyle } from './utils/mapConfig';
 
+import { createClusterGroup } from './utils/clusterUtils';
+import { createTourPopupContent } from './utils/tourConfig';
+
+import useSearchOptions from './hooks/searchOptions';
+
+ import filteredBurials from './hooks/filteredBurials';
 
 // React and Core Dependencies
-import { React, useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { React, useState, useEffect, useMemo, useRef, useCallback, use } from "react";
 
 // Leaflet and Map-related Dependencies
 import { MapContainer, Popup, Marker, GeoJSON, LayersControl, LayerGroup, useMap } from "react-leaflet";
@@ -69,7 +75,7 @@ import HomeIcon from '@mui/icons-material/Home';
 // Local Data and Styles
 import geo_burials from "../../data/Geo_Burials.json";
 import ARC_Roads from "../../data/ARC_Roads.json";
-import ARC_Boundary from "../../data/ARC_Boundary.json";
+import ARC_Boundary from "./utils/boundryData";
 import ARC_Sections from "../../data/ARC_Sections.json";
 import Sec75_Headstones from "../../data/Projected_Sec75_Headstones.json";
 import Sec49_Headstones from "../../data/Projected_Sec49_Headstones.json";
@@ -86,49 +92,7 @@ import CivilWarTour from "../../data/CivilWarTour20.json";
 import PillarsTour from "../../data/SocietyPillarsTour20.json";
 import MayorsTour from "../../data/AlbanyMayors_fixed.json";
 import GARTour from "../../data/GAR_fixed.json";
-
-
-//=============================================================================
-// Constants and Configuration
-//=============================================================================
-
-/**
- * Defines zoom level thresholds for different map behaviors
- */
-const ZOOM_LEVELS = {
-  SECTION: 16,    // Level at which section info becomes visible
-  CLUSTER: 17,    // Level at which markers begin clustering
-  INDIVIDUAL: 20  // Level at which individual markers are always visible
-};
-
-/**
- * Colors used for numbered markers in search results
- * Cycles through these colors for multiple markers
- */
-const MARKER_COLORS = [
-  '#e41a1c', // red
-  '#377eb8', // blue
-  '#4daf4a', // green
-  '#984ea3', // purple
-  '#ff7f00', // orange
-  '#ffff33', // yellow
-  '#a65628', // brown
-  '#f781bf', // pink
-  '#999999'  // grey
-];
-
-/**
- * Default zoom level for focusing on specific locations
- */
-const ZOOM_LEVEL = 18;
-
-
-
-
-
-//=============================================================================
-// React Components
-//=============================================================================
+import injectCustomStyles from './utils/mapCustomStyle';
 
 
 
@@ -136,9 +100,7 @@ const ZOOM_LEVEL = 18;
 
 
 
-//=============================================================================
-// Helper Functions
-//=============================================================================
+
 
 
 
@@ -161,25 +123,11 @@ const ZOOM_LEVEL = 18;
  * Array of unique section numbers from the burial data
  * Sorted numerically with special handling for section 100A
 
-const UNIQUE_SECTIONS = Array.from(new Set(geo_burials.features.map(f => f.properties.Section))).sort((a, b) => {
-  if (a === '100A') return 1;
-  if (b === '100A') return -1;
-  return a - b;
-});
+
  */
 
 
-/**
- * Default style for burial markers
- */
-const markerStyle = {
-  radius: 8,
-  fillColor: "#ff7800",
-  color: "#000",
-  weight: 1,
-  opacity: 1,
-  fillOpacity: 0.8
-};
+
 
 //=============================================================================
 // Tour Components
@@ -204,6 +152,8 @@ const markerStyle = {
  * - Turn-by-turn navigation to burial sites
  */
 export default function BurialMap() {
+
+  const searchOptions = useSearchOptions(geo_burials);
   //-----------------------------------------------------------------------------
   // State Management
   //-----------------------------------------------------------------------------
@@ -238,48 +188,9 @@ export default function BurialMap() {
   // Memoized Values
   //-----------------------------------------------------------------------------
 
-  /**
-   * Create searchable options from burial data
-   * Includes name, section, lot, and tour information
-   */
-  const searchOptions = useMemo(() => 
-    geo_burials.features.map(feature => ({
-      label: `${feature.properties.First_Name} ${feature.properties.Last_Name}`,
-      searchableLabel: `${feature.properties.First_Name} ${feature.properties.Last_Name} (Section ${feature.properties.Section}, Lot ${feature.properties.Lot})`,
-      key: `${feature.properties.OBJECTID}_${feature.properties.First_Name}_${feature.properties.Last_Name}_Section${feature.properties.Section}_Lot${feature.properties.Lot}`,
-      ...feature.properties,
-      coordinates: feature.geometry.coordinates
-    })).filter(option => option.First_Name || option.Last_Name)
-  , []);
+  
+  
 
-  /**
-   * Filter burials based on section/lot/tier criteria
-   */
-  const filteredBurials = useMemo(() => {
-    if (!showAllBurials || !sectionFilter) return [];
-    
-    return geo_burials.features.filter(feature => {
-      const props = feature.properties;
-      
-      if (props.Section !== sectionFilter) {
-        return false;
-      }
-      
-      if (lotTierFilter) {
-        if (filterType === 'lot' && props.Lot !== lotTierFilter) {
-          return false;
-        }
-        if (filterType === 'tier' && props.Tier !== lotTierFilter) {
-          return false;
-        }
-      }
-      
-      return true;
-    }).map(feature => ({
-      ...feature.properties,
-      coordinates: feature.geometry.coordinates
-    }));
-  }, [showAllBurials, sectionFilter, lotTierFilter, filterType]);
 
   //-----------------------------------------------------------------------------
   // Event Handlers
@@ -457,69 +368,8 @@ export default function BurialMap() {
     };
   }, [watchId]);
 
-  /**
-   * Add custom CSS styles for markers and clusters
-   */
   useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      .custom-popup {
-        max-width: 300px !important;
-      }
-      
-      .custom-popup img {
-        display: block;
-        max-width: 200px;
-        max-height: 200px;
-        margin: 8px auto;
-        border: 2px solid #ccc;
-        border-radius: 4px;
-      }
-      
-      .marker-cluster {
-        background-size: contain;
-        background-position: center;
-        background-repeat: no-repeat;
-        width: 40px;
-        height: 40px;
-        margin-left: -20px;
-        margin-top: -20px;
-        text-align: center;
-        font-weight: bold;
-        font-size: 14px;
-        color: #fff;
-        text-shadow: 0 0 2px rgba(0,0,0,0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      
-      .tour-marker {
-        transition: all 0.3s ease;
-      }
-      
-      .tour-marker:hover {
-        transform: scale(1.2);
-      }
-      
-      .tour-marker div {
-        transition: all 0.3s ease;
-      }
-      
-      .tour-marker:hover div {
-        transform: scale(1.2);
-        box-shadow: 0 0 8px rgba(0,0,0,0.6);
-      }
-      
-      .custom-cluster {
-        background: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-    
-    return () => {
-      document.head.removeChild(style);
-    };
+    injectCustomStyles();
   }, []);
 
   /**
@@ -542,17 +392,7 @@ export default function BurialMap() {
         radius: 6
       });
 
-      const popupContent = `
-        <div class="custom-popup">
-          <h3>${burial.First_Name} ${burial.Last_Name}</h3>
-          <p>Section: ${burial.Section}</p>
-          <p>Lot: ${burial.Lot}</p>
-          <p>Tier: ${burial.Tier}</p>
-          <p>Grave: ${burial.Grave}</p>
-          <p>Birth: ${burial.Birth}</p>
-          <p>Death: ${burial.Death}</p>
-        </div>
-      `;
+      const popupContent = createTourPopupContent(burial);
 
       marker.bindPopup(popupContent, {
         maxWidth: 300,
@@ -619,6 +459,7 @@ export default function BurialMap() {
     setRoutingDestination(null);
   };
 
+  
   //=============================================================================
   // Map Layer Management
   //=============================================================================
@@ -652,122 +493,23 @@ export default function BurialMap() {
   /**
    * Initialize GeoJSON layers and overlay maps
    */
-  useEffect(() => {
-    try {
-      // Create tour layers
-      const newTourLayers = TOUR_DATA.reduce((acc, { key, data }) => {
-        acc[key] = L.geoJSON(data, {
-          pointToLayer: createTourMarker(key),
-          onEachFeature: tourCallbacks[key]
-        });
-        return acc;
-      }, {});
+ 
+        useEffect(() => {
+          try {
+            const newTourLayers = TOUR_DATA.reduce((acc, { key, data }) => {  
+              const tourLayer = L.geoJSON(data, {
+                constant, OverlayMaps = combineOverlayMaps(TOUR_DATA, newTourLayers, otherLayers),
+                setOverlayMaps(newOverlayMaps){
 
-      // Create base layers
-      const otherLayers = {
-        boundary: L.geoJSON(ARC_Boundary, { style: exteriorStyle }),
-        roads: L.geoJSON(ARC_Roads, { style: roadStyle }),
-        sections: L.geoJSON(ARC_Sections, { onEachFeature: onEachSection })
-      };
+              }, Catch (error) {
+                console.error('Error loading GeoJSON data:', error);    
+              }
+              }, {tourCallbacks, onEachSection});
 
-      // Combine all layers
-      const newOverlayMaps = {
-        ...TOUR_DATA.reduce((acc, { key, name }) => {
-          acc[name] = newTourLayers[key];
-          return acc;
-        }, {}),
-        "Albany Rural Cemetery Boundary": otherLayers.boundary,
-        "Albany Rural Cemetery Roads": otherLayers.roads,
-        "Section Boundaries": otherLayers.sections
-      };
-
-      setOverlayMaps(newOverlayMaps);
-    } catch (error) {
-      console.error('Error loading GeoJSON data:', error);
-    }
-  }, [tourCallbacks, onEachSection]);
-
-  return (
-    <div className="map-container">
-      {/* Left sidebar with search and filters */}
-      <Paper 
-        elevation={3}
-        className="left-sidebar"
-      >
-        <Box sx={{ p: 2 }}>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Autocomplete
-              freeSolo
-              options={searchOptions}
-              getOptionLabel={(option) => {
-                if (typeof option === 'string') {
-                  return option;
-                }
-                return option.searchableLabel || '';
-              }}
-              onChange={handleSearch}
-              value={currentSelection || null}
-              inputValue={inputValue}
-              onInputChange={(event, newInputValue, reason) => {
-                setInputValue(newInputValue);
-                if (reason === 'clear') {
-                  setCurrentSelection(null);
-                }
-              }}
-              sx={{ flex: 1 }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="Search by name, year, section, tour..."
-                  variant="outlined"
-                  size="small"
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              )}
               filterOptions={(options, { inputValue }) => {
                 return smartSearch(options, inputValue).slice(0, 100);
               }}
-              renderOption={(props, option) => (
-                <li {...props} key={option.key}>
-                  <Box sx={{ width: '100%' }}>
-                    <Typography variant="body1">
-                      {option.First_Name} {option.Last_Name}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Section {option.Section}, Lot {option.Lot}
-                        {option.Birth && ` • Born ${option.Birth}`}
-                        {option.Death && ` • Died ${option.Death}`}
-                      </Typography>
-                      {option.title && (
-                        <Typography 
-                          variant="body2"
-                          sx={{
-                            color: 'white',
-                            backgroundColor: TOURS[option.title]?.color || 'grey',
-                            px: 1,
-                            py: 0.25,
-                            borderRadius: 1,
-                            fontSize: '0.75rem',
-                            whiteSpace: 'nowrap',
-                            ml: 'auto'
-                          }}
-                        >
-                          {TOURS[option.title]?.name || option.title}
-                        </Typography>
-                      )}
-                    </Box>
-                  </Box>
-                </li>
-              )}
-            />
+              
             {currentSelection && (
               <IconButton 
                 onClick={() => addToResults(currentSelection)}
@@ -780,49 +522,7 @@ export default function BurialMap() {
             )}
           </Box>
           
-          {/* Section Filter */}
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Filter by Section
-            </Typography>
-            <Autocomplete
-              options={UNIQUE_SECTIONS}
-              value={sectionFilter || null}
-              onChange={(event, newValue) => {
-                setSectionFilter(newValue || '');
-                if (newValue && !showAllBurials) {
-                  setShowAllBurials(true);
-                }
-                if (newValue && window.mapInstance) {
-                  // Find the section in ARC_Sections and zoom to it
-                  const section = ARC_Sections.features.find(f => f.properties.Section === newValue);
-                  if (section) {
-                    const layer = L.geoJSON(section);
-                    const bounds = layer.getBounds();
-                    window.mapInstance.fitBounds(bounds, {
-                      padding: [50, 50],
-                      maxZoom: ZOOM_LEVELS.CLUSTER
-                    });
-                  }
-                }
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Section"
-                  size="small"
-                  fullWidth
-                />
-              )}
-              renderOption={(props, option) => (
-                <li {...props}>
-                  Section {option}
-                </li>
-              )}
-              getOptionLabel={(option) => `Section ${option}`}
-              isOptionEqualToValue={(option, value) => option === value}
-            />
-          </Box>
+          {selectedBurials.length > 0 && (
 
           {/* Show All Burials Toggle - Only show when a section is selected */}
           {sectionFilter && (

@@ -1,3 +1,4 @@
+
 /**
    * Handles user location tracking
    * Checks if user is within 5 miles of the cemetery

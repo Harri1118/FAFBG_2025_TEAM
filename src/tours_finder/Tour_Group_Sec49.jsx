@@ -27,13 +27,18 @@ const ToursGroupIterative = () => {
       const OBJECTID = feature.properties.OBJECTID;
       const obj = objects[OBJECTID]
       const Full_Name = obj.Full_Name
-      const Notes = obj.Notes
+      const Birth = obj.DOB || "????"
+      const Death = obj.DOD || "????"
       let popupContent = `
         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.4;">
         <strong style="font-size: 14px;">${Full_Name}</strong>
         <hr style="margin: 4px 0;" />
       `
-       
+       popupContent = popupContent + `
+       ${Birth} - ${Death}
+       <br/>
+       `
+
        popupContent = popupContent + `
        Headstone is made from ${obj.Stone_Type}. It is `
        if(obj.Readable == "Yes")
@@ -47,6 +52,7 @@ const ToursGroupIterative = () => {
        <br/>
        Lot ${obj.Lot} Row ${obj.Row}, Position ${obj.Position}
        </div>`; 
+
       layer.bindPopup(popupContent, {
           className: 'custom-popup'
         });

@@ -83,7 +83,7 @@ const Tour_Group = ({ data, color, tourGroup }) => {
                  <p>Date of death: ${Death}</p>
                  </div>
               ` : ""}
-              ${HeadStone ? `<p>Headstone:  {HeadStone}</p>` : ""}
+              ${HeadStone ? `<p>Headstone:  ${HeadStone}</p>` : ""}
               ${Image_Name ? `<img src="https://www.albany.edu/arce/images/${Image_Name}" style="width: 100%; border-radius: 4px; margin-top: 5px;" />` : ""}
               ${
                 Link ? (`<button id="${popupId}" style="margin-top: 8px;">More Info</button>`) : ("")

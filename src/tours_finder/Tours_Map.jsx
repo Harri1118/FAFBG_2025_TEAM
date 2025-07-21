@@ -459,7 +459,7 @@ export default function ToursMap() {
       elevation={3}
       sx={{
         position: 'absolute',
-        top: '200px',
+        top: '250px',
         right: '10px',
         zIndex: 1000,
       }}
@@ -471,6 +471,27 @@ export default function ToursMap() {
         
       </IconButton>
       </Paper>
+    )
+  }
+
+  const onSearchButton = () => {
+    
+  };
+  function SearchButton(){
+    return (
+    <Paper
+    elevation={3}
+    sx={{
+      position: 'absolute',
+      top: '200px',
+      right: '10px',
+      zIndex: 1000,
+    }}
+    >
+      <IconButton>
+        <SearchIcon onClick={onSearchButton}/>
+      </IconButton>
+    </Paper>
     )
   }
   return (
@@ -485,6 +506,7 @@ export default function ToursMap() {
         <CustomZoomControl />
         <DefaultExtentButton />
         <LocationButton/>
+        <SearchButton/>
         <MapBounds />
         <LayersControl>
         <BaseLayer checked name="Topographic">

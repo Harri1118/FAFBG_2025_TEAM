@@ -11,38 +11,13 @@
 // External Dependencies
 //=============================================================================
 
-
-import CustomZoomControl from './components/Map/ZoomControl';
-import {DefaultExtentButton}from './components/Map/DefaultExtentButton';
-import MapBounds from './components/Map/MapBounds';
-import RoutingControl from './components/Map/RoutingControl';
-import VectorBasemap from './components/Map/VectorBasemap';
-import {createOnEachTourFeature} from './components/Map/ResultMarker';
-import MapController from './components/Map/MapController';
-import { TourFilter } from './components/Map/TourFilter';
-import  SearchController from './components/Map/SearchController';
-
-
-import { createMarkeIcon, createNumberedIcon} from './utils/markerUtils';
-import { smartSearch } from './utils/searchUtils';
-import { TOURS } from './utils/tourConfig';
-import TOUR_DATA from './utils/tourConfig';
-import { UNIQUE_SECTIONS } from './utils/mapUtils'; 
-import { getImagePath } from './utils/getImagePath';
-import { createTourPopupContent} from './utils/popupUtils';
-import {createTourMarker} from './utils/createTourMarker';
-import {createUniqueKey} from './utils/createUniqueKey';
-import MapTourController from './components/Map/MapTourController';
-import { exteriorStyle, roadStyle } from './utils/mapUtils';
-
-
 // React and Core Dependencies
 import { React, useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 // Leaflet and Map-related Dependencies
 import { MapContainer, Popup, Marker, GeoJSON, LayersControl, LayerGroup, useMap } from "react-leaflet";
 import L from 'leaflet';  // Core Leaflet library for map functionality
-import "../../styling/index.css";
+//import "../../index.css";
 import 'leaflet.markercluster/dist/leaflet.markercluster';  // Clustering support for markers
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -50,7 +25,6 @@ import 'leaflet-routing-machine';  // Routing capabilities
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'lrm-graphhopper';  // GraphHopper routing integration
 import * as turf from '@turf/turf';  // Geospatial calculations library
-import { BasemapLayer } from 'react-esri-leaflet';  // ESRI basemap integration
 
 // Material-UI Components and Icons
 import { 
@@ -63,110 +37,53 @@ import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import HomeIcon from '@mui/icons-material/Home';
-
 
 // Local Data and Styles
 import geo_burials from "../../data/Geo_Burials.json";
 import ARC_Roads from "../../data/ARC_Roads.json";
 import ARC_Boundary from "../../data/ARC_Boundary.json";
 import ARC_Sections from "../../data/ARC_Sections.json";
-import Sec75_Headstones from "../../data/Projected_Sec75_Headstones.json";
-import Sec49_Headstones from "../../data/Projected_Sec49_Headstones.json";
 
-// Tour Data Imports
-import NotablesTour from "../../data/NotablesTour20.json";
-import IndependenceTour from "../../data/IndependenceTour20.json";
-import AfricanAmericanTour from "../../data/AfricanAmericanTour20.json";
-import ArtistTour from "../../data/ArtistTour20.json";
-import AssociationsTour from "../../data/AssociationsTour20.json";
-import AuthorsTour from "../../data/AuthorsPublishersTour20.json";
-import BusinessTour from "../../data/BusinessFinanceTour20.json";
-import CivilWarTour from "../../data/CivilWarTour20.json";
-import PillarsTour from "../../data/SocietyPillarsTour20.json";
-import MayorsTour from "../../data/AlbanyMayors_fixed.json";
-import GARTour from "../../data/GAR_fixed.json";
+// Constants
+import {DEFAULT_ZOOM_LEVEL, ZOOM_LEVELS, MARKER_COLORS, TOURS} from '../burial_map/utils/constants'
 
+// Components
+import CustomZoomControl from '../burial_map/components/Map/ZoomControl';
+import MapBounds from '../burial_map/components/Map/MapBounds'
+import VectorBasemap from "./components/Map/VectorBasemap";
+import MapController from "./components/Map/MapController";
+import DefaultExtentButton from "./components/Map/DefaultExtentButton";
+import RoutingControl from "./components/Map/RoutingControl"
 
-//=============================================================================
-// Constants and Configuration
-//=============================================================================
+// Tour components
+//import MapTourController from "./components/Tour/MapTourController"
+// Helper functions
+import {createNumberedIcon, createUniqueKey, getImagePath, createTourMarker, createTourPopupContent, smartSearch} from "../burial_map/utils/helperFunctions"
 
+// Data structures
+import { UNIQUE_SECTIONS, TOUR_DATA } from "./utils/data_structs";
 /**
- * Defines zoom level thresholds for different map behaviors
+ * Style configuration for the cemetery boundary
  */
-const ZOOM_LEVELS = {
-  SECTION: 16,    // Level at which section info becomes visible
-  CLUSTER: 17,    // Level at which markers begin clustering
-  INDIVIDUAL: 20  // Level at which individual markers are always visible
+const exteriorStyle = {
+  color: "#ffffff",
+  weight: 1.5,
+  fillOpacity: .08
 };
 
 /**
- * Colors used for numbered markers in search results
- * Cycles through these colors for multiple markers
+ * Style configuration for cemetery roads
  */
-const MARKER_COLORS = [
-  '#e41a1c', // red
-  '#377eb8', // blue
-  '#4daf4a', // green
-  '#984ea3', // purple
-  '#ff7f00', // orange
-  '#ffff33', // yellow
-  '#a65628', // brown
-  '#f781bf', // pink
-  '#999999'  // grey
-];
-
-/**
- * Default zoom level for focusing on specific locations
- */
-const ZOOM_LEVEL = 18;
-
-
-
-
-
-//=============================================================================
-// React Components
-//=============================================================================
-
-
-
-
-
-
-
-//=============================================================================
-// Helper Functions
-//=============================================================================
-
-
-
-
-/**
- * Enhanced search function that supports multiple search strategies
- * @param {Array} options - Array of searchable burial records
- * @param {string} searchInput - The user's search query
- * @returns {Array} Filtered array of matching burial records
- */
-
-
-  
+const roadStyle = {
+  color: '#000000',
+  weight: 2,
+  opacity: 1,
+  fillOpacity: 0.1
+};
 
 //=============================================================================
 // Data Structures
 //=============================================================================
-
-/**
- * Array of unique section numbers from the burial data
- * Sorted numerically with special handling for section 100A
-
-const UNIQUE_SECTIONS = Array.from(new Set(geo_burials.features.map(f => f.properties.Section))).sort((a, b) => {
-  if (a === '100A') return 1;
-  if (b === '100A') return -1;
-  return a - b;
-});
- */
 
 
 /**
@@ -185,10 +102,91 @@ const markerStyle = {
 // Tour Components
 //=============================================================================
 
+// /**
+//  * Component for filtering and selecting cemetery tours
+//  */
+function TourFilter({ overlayMaps, setShowAllBurials, onTourSelect }) {
+  return (
+    <Autocomplete
+      options={TOUR_DATA}
+      getOptionLabel={(option) => option.name}
+      onChange={(event, newValue) => {
+        setShowAllBurials(true);
+        const tourName = newValue ? newValue.name : null;
+        onTourSelect(tourName);
+      }}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Tour"
+          size="small"
+          fullWidth
+        />
+      )}
+      renderOption={(props, option) => (
+        <li {...props}>
+          <Box
+            component="span"
+            sx={{
+              width: 14,
+              height: 14,
+              mr: 1,
+              borderRadius: '50%',
+              backgroundColor: TOURS[option.key].color,
+              display: 'inline-block'
+            }}
+          />
+          {option.name}
+        </li>
+      )}
+    />
+  );
+}
 
+/**
+ * Component that manages the visibility of tour layers on the map
+ */
+function MapTourController({ selectedTour, overlayMaps }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (!map || !overlayMaps) return;
 
+    // Remove all tour layers first
+    TOUR_DATA.forEach(({ name }) => {
+      const layer = overlayMaps[name];
+      if (layer) {
+        map.removeLayer(layer);
+      }
+    });
 
+    // Add only the selected tour layer if it exists
+    if (selectedTour) {
+      const layer = overlayMaps[selectedTour];
+      if (layer) {
+        map.addLayer(layer);
+      }
+    }
+  }, [map, selectedTour, overlayMaps]);
+  
+  return null;
+}
 
+/**
+ * Creates event handlers for tour features
+ * @param {string} tourKey - The key identifying the tour
+ * @returns {Function} Event handler for the tour feature
+ */
+const createOnEachTourFeature = (tourKey) => (feature, layer) => {
+  if (feature.properties && feature.properties.Full_Name) {
+    const content = createTourPopupContent(feature, tourKey);
+    layer.bindPopup(content, {
+      maxWidth: 300,
+      className: 'custom-popup'
+    });
+    feature.properties.title = tourKey;
+  }
+};
 
 //=============================================================================
 // Main Map Component
@@ -387,7 +385,7 @@ export default function BurialMap() {
       const map = window.mapInstance;
       map.flyTo(
         [burial.coordinates[1], burial.coordinates[0]],
-        ZOOM_LEVEL,
+        DEFAULT_ZOOM_LEVEL,
         {
           duration: 1.5,
           easeLinearity: 0.25

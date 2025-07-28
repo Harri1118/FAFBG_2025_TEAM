@@ -7,7 +7,7 @@ import { IconButton, Paper} from "@mui/material";
 import { useMap } from "react-leaflet";
 import HomeIcon from '@mui/icons-material/Home';
  
-function DefaultExtentButton() {
+const DefaultExtentButton = () => {
   const map = useMap();
   
   const handleClick = () => {
@@ -34,4 +34,4 @@ function DefaultExtentButton() {
     </Paper>
   );
 }
-export{ DefaultExtentButton };
+export default DefaultExtentButton;

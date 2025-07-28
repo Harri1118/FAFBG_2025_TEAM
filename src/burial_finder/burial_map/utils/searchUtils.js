@@ -13,99 +13,98 @@ const ZOOM_LEVEL = 18;
 /**
    * Handles search input and selection
    */
-  const handleSearch = useCallback((event, value) => {
-    if (value) {
-      if (typeof value === 'string') {
-        const matches = smartSearch(searchOptions, value);
-        if (matches.length > 0) {
-          addToResults(matches[0]);
-        }
-      } else {
-        addToResults(value);
-      }
-    }
-  }, [searchOptions, addToResults]);
+  const handleSearch = (event, value) => {
+    // if (value) {
+    //   if (typeof value === 'string') {
+    //     const matches = smartSearch(searchOptions, value);
+    //     if (matches.length > 0) {
+    //       addToResults(matches[0]);
+    //     }
+    //   } else {
+    //     addToResults(value);
+    //   }
+    // }
+  };
 
   /**
    * Removes a burial from search results
    */
-  const removeFromResults = useCallback((objectId) => {
-    setSelectedBurials(prev => prev.filter(burial => burial.OBJECTID !== objectId));
-  }, []);
+  const removeFromResults = (objectId) => {
+    //setSelectedBurials(prev => prev.filter(burial => burial.OBJECTID !== objectId));
+  };
 
   /**
    * Clears all search results
    */
-  const clearSearch = useCallback(() => {
-    setSelectedBurials([]);
-    setInputValue('');
-    setCurrentSelection(null);
-  }, []);
+  const clearSearch = () => {
+    // setSelectedBurials([]);
+    // setInputValue('');
+    // setCurrentSelection(null);
+  };
 
   /**
    * Handles clicking on a search result item
    */
-  const handleResultClick = useCallback((burial, index) => {
-    if (window.mapInstance) {
-      const map = window.mapInstance;
-      map.flyTo(
-        [burial.coordinates[1], burial.coordinates[0]],
-        ZOOM_LEVEL,
-        {
-          duration: 1.5,
-          easeLinearity: 0.25
-        }
-      );
-    }
-  }, []);
+  const handleResultClick = (burial, index) => {
+    // if (window.mapInstance) {
+    //   const map = window.mapInstance;
+    //   map.flyTo(
+    //     [burial.coordinates[1], burial.coordinates[0]],
+    //     ZOOM_LEVEL,
+    //     {
+    //       duration: 1.5,
+    //       easeLinearity: 0.25
+    //     }
+    //   );
+    // }
+  };
 
   /**
    * Handles clicking on a marker
    */
-  const handleMarkerClick = useCallback((burial, index) => {
-    if (window.mapInstance) {
-      const map = window.mapInstance;
-      map.panTo([burial.coordinates[1], burial.coordinates[0]], {
-        duration: 1.5
-      });
-    }
-  }, []);
+  const handleMarkerClick = (burial, index) => {
+    // if (window.mapInstance) {
+    //   const map = window.mapInstance;
+    //   map.panTo([burial.coordinates[1], burial.coordinates[0]], {
+    //     duration: 1.5
+    //   });
+    // }
+  };
 
   /**
    * Creates a marker cluster group with custom styling
    */
-  const createClusterGroup = useCallback(() => {
-    return L.markerClusterGroup({
-      maxClusterRadius: 70,
-      disableClusteringAtZoom: 21,
-      spiderfyOnMaxZoom: false,
-      removeOutsideVisibleBounds: true,
-      chunkedLoading: true,
-      chunkInterval: 200,
-      chunkDelay: 50,
-      iconCreateFunction: (cluster) => {
-        const count = cluster.getChildCount();
-        return L.divIcon({
-          html: `<div style="
-            background-color: rgba(0,123,255,0.6);
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px;
-          ">${count}</div>`,
-          className: 'custom-cluster-icon',
-          iconSize: [30, 30]
-        });
-      }
-    });
-  }, []);
+  const createClusterGroup = () => {
+    // return L.markerClusterGroup({
+    //   maxClusterRadius: 70,
+    //   disableClusteringAtZoom: 21,
+    //   spiderfyOnMaxZoom: false,
+    //   removeOutsideVisibleBounds: true,
+    //   chunkedLoading: true,
+    //   chunkInterval: 200,
+    //   chunkDelay: 50,
+    //   iconCreateFunction: (cluster) => {
+    //     const count = cluster.getChildCount();
+    //     return L.divIcon({
+    //       html: `<div style="
+    //         background-color: rgba(0,123,255,0.6);
+    //         border: none;
+    //         border-radius: 50%;
+    //         width: 30px;
+    //         height: 30px;
+    //         display: flex;
+    //         align-items: center;
+    //         justify-content: center;
+    //         color: white;
+    //         font-size: 14px;
+    //       ">${count}</div>`,
+    //       className: 'custom-cluster-icon',
+    //       iconSize: [30, 30]
+    //     });
+    //   }
+    // });
+  };
 
-  export {handleSearch, removeFromResults, clearSearch, handleResultClick, handleMarkerClick, createClusterGroup};   
 
   /**
  * Enhanced search function that supports multiple search strategies
@@ -188,5 +187,4 @@ const smartSearch = (options, searchInput) => {
     return nameMatch || tourMatch;
   });
 };
-export { smartSearch };
-
+export { smartSearch, handleSearch, removeFromResults, clearSearch, handleResultClick, handleMarkerClick, createClusterGroup};   

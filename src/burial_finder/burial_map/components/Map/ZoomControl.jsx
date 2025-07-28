@@ -6,8 +6,8 @@ import RemoveIcon from '@mui/icons-material/Remove';
  * Custom zoom control component that provides zoom in/out buttons
  * Positioned at the top-right corner of the map
  */
-function CustomZoomControl() {
-  const map = useMap();
+const CustomZoomControl = () => {
+  const Map = useMap()
   
   return (
     <Paper 
@@ -24,10 +24,10 @@ function CustomZoomControl() {
         variant="contained"
         size="small"
       >
-        <IconButton onClick={() => map.zoomIn()} size="small">
+        <IconButton onClick={() => Map.zoomIn()} size="small">
           <AddIcon />
         </IconButton>
-        <IconButton onClick={() => map.zoomOut()} size="small">
+        <IconButton onClick={() => Map.zoomOut()} size="small">
           <RemoveIcon />
         </IconButton>
       </ButtonGroup>

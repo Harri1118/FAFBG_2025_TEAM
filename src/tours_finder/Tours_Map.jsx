@@ -407,6 +407,8 @@ export default function ToursMap() {
   const [status, setStatus] = useState('Find me');
   const [routingDestination, setRoutingDestination] = useState(null);
   const [watchId, setWatchId] = useState(null);
+  
+  const [searchInput, setSearchInput] = useState("");
 
   // Component References
   const { BaseLayer } = LayersControl;
@@ -474,9 +476,11 @@ export default function ToursMap() {
     )
   }
 
-  const onSearchButton = () => {
-    
+  const onSearchButton = (e) => {
+      e.preventDefault();
+      const val = document.getElementById("searchButtonTextInp").value    
   };
+
   function SearchButton(){
     return (
     <Paper
@@ -488,6 +492,7 @@ export default function ToursMap() {
       zIndex: 1000,
     }}
     >
+      <input type="text" id="searchButtonTextInp" />
       <IconButton>
         <SearchIcon onClick={onSearchButton}/>
       </IconButton>
@@ -528,20 +533,20 @@ export default function ToursMap() {
           </LayerGroup>
         <LayerGroup>
 
-            <TourGroup data={Lot7} color="#7587ff" tourGroup="Soldiers Lot (Section 75, Lot 7)"/>
+            <TourGroup data={Lot7} color="#7587ff" tourGroup="Soldiers Lot (Section 75, Lot 7)" keyWord="Lot7" />
             {/* <TourGroup data={Sec49_Headstones} color="#75ff87" tourGroup="Mayors of Albany"/> */}
             <ToursGroupIterative/>
-            <TourGroup data={NotablesTour} color="#ff7700" tourGroup="Notables Tour 2020"/>
-            <TourGroup data={IndependenceTour} color="#7700ff" tourGroup="Independence Tour 2020"/>
-            <TourGroup data={AfricanAmericanTour} color="#eedd00" tourGroup="African American Tour 2020"/>
-            <TourGroup data={ArtistTour} color="#ff4277" tourGroup="Artists Tour 2020"/>
-            <TourGroup data={AssociationsTour} color="#86cece" tourGroup="Associations, Societies, & Groups Tour 2020"/>
-            <TourGroup data={AuthorsTour} color="#996038" tourGroup="Authors & Publishers Tour 2020"/> 
-            <TourGroup data={BusinessTour} color="#558e76" tourGroup="Business & Finance Tour 2020"/> 
-            <TourGroup data={CivilWarTour} color="#a0a0a0" tourGroup="Civil War Tour 2020"/>
-            <TourGroup data={PillarsTour} color="#d10008" tourGroup="Pillars of Society Tour 2020"/>
-            <TourGroup data={MayorsTour} color="#ff00dd" tourGroup="Mayors of Albany"/>
-            <TourGroup data={GARTour} color="#000080" tourGroup="Grand Army of the Republic"/>
+            <TourGroup data={NotablesTour} color="#ff7700" tourGroup="Notables Tour 2020" keyWord="Notable" />
+            <TourGroup data={IndependenceTour} color="#7700ff" tourGroup="Independence Tour 2020" keyWord="Indep" />
+            <TourGroup data={AfricanAmericanTour} color="#eedd00" tourGroup="African American Tour 2020" keyWord="Afr" />
+            <TourGroup data={ArtistTour} color="#ff4277" tourGroup="Artists Tour 2020" keyWord="Art"/>
+            <TourGroup data={AssociationsTour} color="#86cece" tourGroup="Associations, Societies, & Groups Tour 2020" keyWord="Groups"/>
+            <TourGroup data={AuthorsTour} color="#996038" tourGroup="Authors & Publishers Tour 2020" keyWord="AuthPub" /> 
+            <TourGroup data={BusinessTour} color="#558e76" tourGroup="Business & Finance Tour 2020" keyWord="Business" /> 
+            <TourGroup data={CivilWarTour} color="#a0a0a0" tourGroup="Civil War Tour 2020" keyWord="CivilWar" />
+            <TourGroup data={PillarsTour} color="#d10008" tourGroup="Pillars of Society Tour 2020" keyWord="Pillars" />
+            <TourGroup data={MayorsTour} color="#ff00dd" tourGroup="Mayors of Albany" keyWord="Mayors of Albany" />
+            <TourGroup data={GARTour} color="#000080" tourGroup="Grand Army of the Republic" keyWord="G A R" />
             <LayersControl.Overlay name="Sections">
             <GeoJSON data={ARC_Sections} style={sectionBoundaryStyle}
             onEachFeature={(feature, layer) => {

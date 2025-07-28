@@ -6,7 +6,7 @@ import {Box, useMediaQuery} from "@mui/material"
 import Modal from '@mui/material/Modal';
 
 
-const Tour_Group = ({ data, color, tourGroup }) => {
+const Tour_Group = ({ data, color, tourGroup, keyWord }) => {
   const geoJsonRef = useRef();
   const [selectedFeature, setSelectedFeature] = useState(null);
   const isMobile = useMediaQuery('(max-width:768px)');
@@ -44,7 +44,8 @@ const Tour_Group = ({ data, color, tourGroup }) => {
 
   return(
   <LayerGroup>
-  <LayersControl.Overlay checked name={tourGroup}>
+  <LayersControl.Overlay checked name={`<span style="background-color: ${color}; color: white; padding: 2px">${keyWord}</span> ${tourGroup}`}
+  >
 
       <GeoJSON data={data} style={pointStyle} 
       pointToLayer={(feature, latlng) => {

@@ -120,6 +120,39 @@ const URLS = [
 // Style Definitions
 //=============================================================================
 
+const TOURS = {
+  Lot7: { name: "Soldier's Lot (Section 75, Lot 7)", color: '#7587ff' },
+  Sec49: { name: "Section 49", color: '#75ff87' },
+  Notable: { name: "Notables Tour 2020", color: '#ff7700' },
+  Indep: { name: "Independence Tour 2020", color: '#7700ff' },
+  Afr: { name: "African American Tour 2020", color: '#eedd00' },
+  Art: { name: "Artists Tour 2020", color: '#ff4277' },
+  Groups: { name: "Associations, Societies, & Groups Tour 2020", color: '#86cece' },
+  AuthPub: { name: "Authors & Publishers Tour 2020", color: '#996038' },
+  Business: { name: "Business & Finance Tour 2020", color: '#558e76' },
+  CivilWar: { name: "Civil War Tour 2020", color: '#a0a0a0' },
+  Pillars: { name: "Pillars of Society Tour 2020", color: '#d10008' },
+  MayorsOfAlbany: { name: "Mayors of Albany", color: '#ff00dd' },
+  GAR: { name: "Grand Army of the Republic", color: '#000080' }
+};
+
+const TOUR_DATA = [
+  { key: 'Lot7', data: Sec75_Headstones, name: "Soldier's Lot (Section 75, Lot 7)" },
+  { key: 'Sec49', data: Sec49_Headstones, name: "Section 49" },
+  { key: 'Notable', data: NotablesTour, name: "Notables Tour 2020" },
+  { key: 'Indep', data: IndependenceTour, name: "Independence Tour 2020" },
+  { key: 'Afr', data: AfricanAmericanTour, name: "African American Tour 2020" },
+  { key: 'Art', data: ArtistTour, name: "Artists Tour 2020" },
+  { key: 'Groups', data: AssociationsTour, name: "Associations, Societies, & Groups Tour 2020" },
+  { key: 'AuthPub', data: AuthorsTour, name: "Authors & Publishers Tour 2020" },
+  { key: 'Business', data: BusinessTour, name: "Business & Finance Tour 2020" },
+  { key: 'CivilWar', data: CivilWarTour, name: "Civil War Tour 2020" },
+  { key: 'Pillars', data: PillarsTour, name: "Pillars of Society Tour 2020" },
+  { key: 'MayorsOfAlbany', data: MayorsTour, name: "Mayors of Albany" },
+  { key: 'GAR', data: GARTour, name: "Grand Army of the Republic" }
+];
+
+
 /**
  * Style configuration for the cemetery boundary
  */
@@ -136,6 +169,15 @@ const sectionBoundaryStyle = {
 }
 
 /**
+ * Creates a unique key for a burial record
+ * @param {Object} burial - The burial record object
+ * @param {number} index - The index of the burial in the list
+ * @returns {string} A unique identifier string
+ */
+const createUniqueKey = (burial, index) => {
+  return `${burial.OBJECTID}_${burial.Section}_${burial.Lot}_${burial.Grave}_${index}`;
+};
+/**
  * Style configuration for cemetery roads
  */
 const roadStyle = {
@@ -145,6 +187,56 @@ const roadStyle = {
   fillOpacity: 0.1
 };
 
+/**
+ * Array of unique section numbers from the burial data
+ * Sorted numerically with special handling for section 100A
+ */
+const UNIQUE_SECTIONS = Array.from(new Set(geo_burials.features.map(f => f.properties.Section))).sort((a, b) => {
+  if (a === '100A') return 1;
+  if (b === '100A') return -1;
+  return a - b;
+});
+
+/**
+ * Component for filtering and selecting cemetery tours
+ */
+function TourFilter({ overlayMaps, setShowAllBurials, onTourSelect }) {
+  return (
+    <Autocomplete
+      options={TOUR_DATA}
+      getOptionLabel={(option) => option.name}
+      onChange={(event, newValue) => {
+        setShowAllBurials(true);
+        const tourName = newValue ? newValue.name : null;
+        onTourSelect(tourName);
+      }}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Tour"
+          size="small"
+          fullWidth
+        />
+      )}
+      renderOption={(props, option) => (
+        <li {...props}>
+          <Box
+            component="span"
+            sx={{
+              width: 14,
+              height: 14,
+              mr: 1,
+              borderRadius: '50%',
+              backgroundColor: TOURS[option.key].color,
+              display: 'inline-block'
+            }}
+          />
+          {option.name}
+        </li>
+      )}
+    />
+  );
+}
 //=============================================================================
 // React Components
 //=============================================================================
@@ -182,6 +274,83 @@ function CustomZoomControl() {
   );
 }
 
+const smartSearch = (options, searchInput) => {
+  const input = searchInput.toLowerCase().trim();
+  if (!input) return [];
+
+  // Year search (4 digits)
+  const yearPattern = /^\d{4}$/;
+  if (yearPattern.test(input)) {
+    return options.filter(option => 
+      (option.Birth && option.Birth.includes(input)) ||
+      (option.Death && option.Death.includes(input))
+    );
+  }
+
+  // Section search (e.g., "section 1" or "sec 1")
+  const sectionPattern = /^(section|sec)\s*([a-zA-Z0-9]+)$/i;
+  const sectionMatch = input.match(sectionPattern);
+  if (sectionMatch) {
+    const sectionQuery = sectionMatch[2];
+    return options.filter(option => 
+      option.Section && option.Section.toString().toLowerCase() === sectionQuery.toLowerCase()
+    );
+  }
+
+  // Lot search (e.g., "lot 123")
+  const lotPattern = /^lot\s*(\d+)$/i;
+  const lotMatch = input.match(lotPattern);
+  if (lotMatch) {
+    const lotQuery = lotMatch[1];
+    return options.filter(option => 
+      option.Lot && option.Lot.toString() === lotQuery
+    );
+  }
+
+  // Tour search by name (e.g., "notable tour", "civil war tour")
+  const tourPattern = /^(.*?)\s*tour$/i;
+  const tourMatch = input.match(tourPattern);
+  if (tourMatch) {
+    const tourQuery = tourMatch[1].toLowerCase();
+    return options.filter(option => {
+      if (!option.title) return false;
+      const tourName = TOURS[option.title]?.name.toLowerCase() || '';
+      return tourName.includes(tourQuery);
+    });
+  }
+
+  // Tour search by keyword
+  const tourKeywords = Object.values(TOURS).map(tour => tour.name.toLowerCase());
+  const matchesTour = tourKeywords.some(keyword => keyword.includes(input));
+  if (matchesTour) {
+    return options.filter(option => {
+      if (!option.title) return false;
+      const tourName = TOURS[option.title]?.name.toLowerCase() || '';
+      return tourName.includes(input);
+    });
+  }
+
+  // Numeric search (section, lot, or year)
+  const numberPattern = /^\d+$/;
+  if (numberPattern.test(input)) {
+    return options.filter(option => 
+      (option.Section && option.Section.toString() === input) ||
+      (option.Lot && option.Lot.toString() === input) ||
+      (option.Birth && option.Birth.includes(input)) ||
+      (option.Death && option.Death.includes(input))
+    );
+  }
+
+  // Default name search
+  return options.filter(option => {
+    const nameMatch = option.searchableLabel.toLowerCase().includes(input);
+    const tourMatch = option.title && TOURS[option.title]?.name.toLowerCase().includes(input);
+    return nameMatch || tourMatch;
+  });
+};
+
+
+
 /**
  * Component that restricts map bounds and zoom levels to the cemetery area
  * Uses Turf.js for geospatial calculations
@@ -216,6 +385,20 @@ function MapBounds() {
 }
 
 /**
+ * Component that manages map state and provides access to the map instance
+ */
+function MapController({ selectedBurials, hoveredIndex }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    // Store the map instance globally for external access
+    window.mapInstance = map;
+  }, [map]);
+  
+  return null;
+}
+
+/**
  * Component that renders the ESRI vector basemap
  */
 function VectorBasemap({ name }) {
@@ -229,7 +412,8 @@ function RoutingControl({ from, to }) {
   const map = useMap();
   const [routingError, setRoutingError] = useState(null);
   const [isCalculating, setIsCalculating] = useState(false);
-  
+   const [selectedBurials, setSelectedBurials] = useState([]);
+  const [currentSelection, setCurrentSelection] = useState(null);
   useEffect(() => {
     if (!from || !to) return;
 
@@ -408,11 +592,84 @@ export default function ToursMap() {
   const [routingDestination, setRoutingDestination] = useState(null);
   const [watchId, setWatchId] = useState(null);
   
+  const [showSearchBar, setShowSearchBar] = useState(false);
   const [searchInput, setSearchInput] = useState("");
 
   // Component References
   const { BaseLayer } = LayersControl;
+
+   /**
+     * Handle tour selection
+     */
+    const handleTourSelect = useCallback((tourName) => {
+      setSelectedTour(tourName);
+    }, []);
   
+      /**
+       * Handles clicking on a search result item
+       */
+      const handleResultClick = useCallback((burial, index) => {
+        if (window.mapInstance) {
+          const map = window.mapInstance;
+          map.flyTo(
+            [burial.coordinates[1], burial.coordinates[0]],
+            ZOOM_LEVEL,
+            {
+              duration: 1.5,
+              easeLinearity: 0.25
+            }
+          );
+        }
+      }, []);
+
+        /**
+         * Removes a burial from search results
+         */
+        const removeFromResults = useCallback((objectId) => {
+          setSelectedBurials(prev => prev.filter(burial => burial.OBJECTID !== objectId));
+        }, []);
+    /**
+   * Handles adding a burial to the search results
+   */
+  const addToResults = useCallback((burial) => {
+    if (burial && !selectedBurials.some(b => b.OBJECTID === burial.OBJECTID)) {
+      setSelectedBurials(prev => [...prev, burial]);
+      setCurrentSelection(null);
+      setInputValue('');
+      
+      if (window.mapInstance) {
+        window.mapInstance.panTo([burial.coordinates[1], burial.coordinates[0]], {
+          duration: 1.5
+        });
+      }
+    }
+  }, [selectedBurials]);
+
+  const searchOptions = useMemo(() => 
+      geo_burials.features.map(feature => ({
+        label: `${feature.properties.First_Name} ${feature.properties.Last_Name}`,
+        searchableLabel: `${feature.properties.First_Name} ${feature.properties.Last_Name} (Section ${feature.properties.Section}, Lot ${feature.properties.Lot})`,
+        key: `${feature.properties.OBJECTID}_${feature.properties.First_Name}_${feature.properties.Last_Name}_Section${feature.properties.Section}_Lot${feature.properties.Lot}`,
+        ...feature.properties,
+        coordinates: feature.geometry.coordinates
+      })).filter(option => option.First_Name || option.Last_Name)
+    , []);
+  
+      /**
+       * Handles search input and selection
+       */
+      const handleSearch = useCallback((event, value) => {
+        if (value) {
+          if (typeof value === 'string') {
+            const matches = smartSearch(searchOptions, value);
+            if (matches.length > 0) {
+              addToResults(matches[0]);
+            }
+          } else {
+            addToResults(value);
+          }
+        }
+      }, [searchOptions, addToResults]);
   const onLocateMarker = () => {
     if (!navigator.geolocation) {
       setStatus('Geolocation is not supported by your browser');
@@ -476,13 +733,24 @@ export default function ToursMap() {
     )
   }
 
+    /**
+     * Clears all search results
+     */
+    const clearSearch = useCallback(() => {
+      setSelectedBurials([]);
+      setInputValue('');
+      setCurrentSelection(null);
+    }, []);
   const onSearchButton = (e) => {
       e.preventDefault();
-      const val = document.getElementById("searchButtonTextInp").value    
+      const val = document.getElementById("searchButtonTextInp").value   
+      console.log(val)
   };
 
   function SearchButton(){
     return (
+      
+        
     <Paper
     elevation={3}
     sx={{
@@ -492,15 +760,361 @@ export default function ToursMap() {
       zIndex: 1000,
     }}
     >
-      <input type="text" id="searchButtonTextInp" />
+    {!showSearchBar? (
       <IconButton>
-        <SearchIcon onClick={onSearchButton}/>
+        <SearchIcon onClick={() => setShowSearchBar(true)}/>
       </IconButton>
+    ) : (
+      <div>
+      <input type="text" id="searchButtonTextInp" placeholder="Search..." onChange={onSearchButton}/>
+      <SearchIcon onClick={() => setShowSearchBar(false)}/>
+      </div>
+    )
+    }
     </Paper>
+    
     )
   }
   return (
     <div className="map-container">
+      <Paper 
+        elevation={3}
+        className="left-sidebar"
+      >
+        <Box sx={{ p: 2 }}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Autocomplete
+              freeSolo
+              options={searchOptions}
+              getOptionLabel={(option) => {
+                if (typeof option === 'string') {
+                  return option;
+                }
+                return option.searchableLabel || '';
+              }}
+              onChange={handleSearch}
+              value={currentSelection || null}
+              inputValue={inputValue}
+              onInputChange={(event, newInputValue, reason) => {
+                setInputValue(newInputValue);
+                if (reason === 'clear') {
+                  setCurrentSelection(null);
+                }
+              }}
+              sx={{ flex: 1 }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Search by name, year, section, tour..."
+                  variant="outlined"
+                  size="small"
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+              filterOptions={(options, { inputValue }) => {
+                return smartSearch(options, inputValue).slice(0, 100);
+              }}
+              renderOption={(props, option) => (
+                <li {...props} key={option.key}>
+                  <Box sx={{ width: '100%' }}>
+                    <Typography variant="body1">
+                      {option.First_Name} {option.Last_Name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Section {option.Section}, Lot {option.Lot}
+                        {option.Birth && ` • Born ${option.Birth}`}
+                        {option.Death && ` • Died ${option.Death}`}
+                      </Typography>
+                      {option.title && (
+                        <Typography 
+                          variant="body2"
+                          sx={{
+                            color: 'white',
+                            backgroundColor: TOURS[option.title]?.color || 'grey',
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 1,
+                            fontSize: '0.75rem',
+                            whiteSpace: 'nowrap',
+                            ml: 'auto'
+                          }}
+                        >
+                          {TOURS[option.title]?.name || option.title}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                </li>
+              )}
+            />
+            {currentSelection && (
+              <IconButton 
+                onClick={() => addToResults(currentSelection)}
+                color="primary"
+                size="small"
+                sx={{ alignSelf: 'center' }}
+              >
+                <AddIcon />
+              </IconButton>
+            )}
+          </Box>
+          
+          {/* Section Filter */}
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Filter by Section
+            </Typography>
+            <Autocomplete
+              options={UNIQUE_SECTIONS}
+              value={sectionFilter || null}
+              onChange={(event, newValue) => {
+                setSectionFilter(newValue || '');
+                if (newValue && !showAllBurials) {
+                  setShowAllBurials(true);
+                }
+                if (newValue && window.mapInstance) {
+                  // Find the section in ARC_Sections and zoom to it
+                  const section = ARC_Sections.features.find(f => f.properties.Section === newValue);
+                  if (section) {
+                    const layer = L.geoJSON(section);
+                    const bounds = layer.getBounds();
+                    window.mapInstance.fitBounds(bounds, {
+                      padding: [50, 50],
+                      maxZoom: ZOOM_LEVELS.CLUSTER
+                    });
+                  }
+                }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Section"
+                  size="small"
+                  fullWidth
+                />
+              )}
+              renderOption={(props, option) => (
+                <li {...props}>
+                  Section {option}
+                </li>
+              )}
+              getOptionLabel={(option) => `Section ${option}`}
+              isOptionEqualToValue={(option, value) => option === value}
+            />
+          </Box>
+
+          {/* Show All Burials Toggle - Only show when a section is selected */}
+          {sectionFilter && (
+            <Box sx={{ mt: 2 }}>
+              <Button
+                variant={showAllBurials ? 'contained' : 'outlined'}
+                color="primary"
+                size="small"
+                fullWidth
+                onClick={() => setShowAllBurials(!showAllBurials)}
+                startIcon={showAllBurials ? <RemoveIcon /> : <AddIcon />}
+              >
+                {showAllBurials ? 'Hide Section Burials' : 'Show Section Burials'}
+              </Button>
+            </Box>
+          )}
+
+          {/* Filters - only shown when a section is selected */}
+          {sectionFilter && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Filter Section {sectionFilter} Burials
+              </Typography>
+              
+              {/* Lot/Tier Toggle */}
+              <ButtonGroup 
+                fullWidth 
+                size="small" 
+                sx={{ mt: 1 }}
+              >
+                <Button
+                  variant={filterType === 'lot' ? 'contained' : 'outlined'}
+                  onClick={() => setFilterType('lot')}
+                >
+                  Lot
+                </Button>
+                <Button
+                  variant={filterType === 'tier' ? 'contained' : 'outlined'}
+                  onClick={() => setFilterType('tier')}
+                >
+                  Tier
+                </Button>
+              </ButtonGroup>
+              
+              {/* Lot/Tier Filter */}
+              <TextField
+                fullWidth
+                size="small"
+                label={filterType === 'lot' ? 'Lot Number' : 'Tier Number'}
+                value={lotTierFilter}
+                onChange={(e) => setLotTierFilter(e.target.value)}
+                margin="dense"
+              />
+              
+              {/* Clear Filters */}
+              <Button
+                variant="outlined"
+                color="secondary"
+                size="small"
+                fullWidth
+                sx={{ mt: 1 }}
+                onClick={() => {
+                  setLotTierFilter('');
+                  setFilterType('lot');
+                  setSectionFilter('');
+                  setShowAllBurials(false);
+                  // Reset map view to original bounds
+                  if (window.mapInstance) {
+                    const bounds = turf.bbox(ARC_Boundary.features[0]);
+                    const padding = 0.01; // roughly 1km in decimal degrees
+                    const southWest = [bounds[1] - padding, bounds[0] - padding];
+                    const northEast = [bounds[3] + padding, bounds[2] + padding];
+                    window.mapInstance.fitBounds([southWest, northEast]);
+                  }
+                }}
+              >
+                Clear Filters
+              </Button>
+            </Box>
+          )}
+          
+          {/* Tour Filter */}
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Filter by Tour
+            </Typography>
+            <TourFilter 
+              overlayMaps={overlayMaps} 
+              setShowAllBurials={setShowAllBurials} 
+              onTourSelect={handleTourSelect}
+            />
+          </Box>
+          
+          {/* Location Button */}
+          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            <Button 
+              onClick={onLocateMarker} 
+              variant='contained' 
+              color='secondary' 
+              size='small' 
+              startIcon={<PinDropIcon />}
+              sx={{ flex: 1 }}
+            >
+              {status}
+            </Button>
+          </Box>
+        </Box>
+
+        <Divider />
+
+        {/* Search Results */}
+        {selectedBurials.length > 0 && (
+          <Box sx={{ maxHeight: 'calc(100vh - 200px)', overflow: 'auto' }}>
+            <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="h6">Search Results ({selectedBurials.length})</Typography>
+              <IconButton onClick={clearSearch} size="small">
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <List>
+              {selectedBurials.map((burial, index) => (
+                <ListItem 
+                  key={createUniqueKey(burial, index)}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  onClick={() => handleResultClick(burial, index)}
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    backgroundColor: hoveredIndex === index ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    }
+                  }}
+                  secondaryAction={
+                    <IconButton 
+                      edge="end" 
+                      aria-label="remove" 
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFromResults(burial.OBJECTID);
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  }
+                >
+                  <Box
+                    sx={{
+                      width: hoveredIndex === index ? '32px' : '24px',
+                      height: hoveredIndex === index ? '32px' : '24px',
+                      borderRadius: '50%',
+                      backgroundColor: MARKER_COLORS[index % MARKER_COLORS.length],
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: 1,
+                      fontWeight: 'bold',
+                      fontSize: hoveredIndex === index ? '16px' : '14px',
+                      border: hoveredIndex === index ? '3px solid white' : '2px solid white',
+                      boxShadow: hoveredIndex === index ? '0 0 8px rgba(0,0,0,0.6)' : '0 0 4px rgba(0,0,0,0.4)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {index + 1}
+                  </Box>
+                  <ListItemText
+                    primary={`${burial.First_Name} ${burial.Last_Name}`}
+                    secondary={
+                      <Box component="span">
+                        <Typography component="span" variant="body2" display="block">Section: {burial.Section}</Typography>
+                        <Typography component="span" variant="body2" display="block">Lot: {burial.Lot}</Typography>
+                        <Typography component="span" variant="body2" display="block">Tier: {burial.Tier}</Typography>
+                        <Typography component="span" variant="body2" display="block">Grave: {burial.Grave}</Typography>
+                        <Typography component="span" variant="body2" display="block">Birth: {burial.Birth}</Typography>
+                        <Typography component="span" variant="body2" display="block">Death: {burial.Death}</Typography>
+                        {burial.title && (
+                          <Typography 
+                            component="span" 
+                            variant="body2" 
+                            display="block"
+                            sx={{
+                              mt: 1,
+                              color: 'white',
+                              backgroundColor: TOURS[burial.title]?.color || 'grey',
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: 1,
+                              display: 'inline-block'
+                            }}
+                          >
+                            {TOURS[burial.title]?.name || burial.title}
+                          </Typography>
+                        )}
+                      </Box>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        )}
+      </Paper>
       <MapContainer
         center={[42.704180, -73.731980]}
         zoom={14}

@@ -16,6 +16,8 @@
     "@turf/turf": "^7.2.0",
     "ag-grid-community": "^27.1.0",
     "ag-grid-react": "^27.1.0",
+    "ajv": "^6.12.6",
+    "ajv-keywords": "^3.5.2",
     "axios": "^0.26.1",
     "esri-leaflet": "^3.0.14",
     "esri-leaflet-vector": "^4.2.7",

@@ -1,14 +1,14 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { Box } from "@mui/system";
-import TOUR_DATA from '../../utils/tourConfig'
-import { TOURS } from '../../utils/tourConfig';
+import { TOUR_DATA } from "../../utils/data_structs";
+import { TOURS } from "../../utils/constants";
  /**
  * Component for filtering and selecting cemetery tours
  */
 function TourFilter({ overlayMaps, setShowAllBurials, onTourSelect }) {
   return (
     <Autocomplete
-      options={TOUR_DATA}
+       options={TOUR_DATA}
       getOptionLabel={(option) => option.name}
       onChange={(event, newValue) => {
         setShowAllBurials(true);

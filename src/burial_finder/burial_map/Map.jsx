@@ -381,13 +381,6 @@ export default function BurialMap() {
     };
   }, [handleZoomEnd]);
 
-  /**
-   * Handle tour selection
-   */
-  const handleTourSelect = useCallback((tourName) => {
-    setSelectedTour(tourName);
-  }, []);
-
   //=============================================================================
   // Routing Functions
   //=============================================================================
@@ -483,17 +476,17 @@ export default function BurialMap() {
     <div className="map-container">
       {/* Left sidebar with search and filters */}
       <SearchBurials 
-      turf={turf} 
       selectedBurials={selectedBurials}
-      status={status}
-      selectedTour={selectedTour}
+      updateSelectedBurials={setSelectedBurials}
+      updateSelectedTour={setSelectedTour}
       hoveredIndex={hoveredIndex}
       showAllBurials={showAllBurials}
       refLat={lat}
       refLng={lng}
       sectionFilter={sectionFilter}
-      watchId={watchId}
+      updateSectionFilter={setSectionFilter}
       overlayMaps={overlayMaps}
+      includesTour={true}
       />
 
       <MapContainer
@@ -654,6 +647,8 @@ export default function BurialMap() {
           ))}
         </LayersControl>
       </MapContainer>
+
+
     </div>
   );
 }

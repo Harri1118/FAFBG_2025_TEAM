@@ -21,12 +21,12 @@ const MapTourController = ({ data, selectedTour, overlayMaps }) => {
     });
 
     // Add only the selected tour layer if it exists
-    // if (selectedTour) {
-    //   const layer = overlayMaps[selectedTour];
-    //   if (layer) {
-    //     map.addLayer(layer);
-    //   }
-    // }
+    if (selectedTour) {
+      const layer = overlayMaps[selectedTour];
+      if (layer) {
+        map.addLayer(layer);
+      }
+    }
   }, [map, selectedTour, overlayMaps]);
   
   return null;

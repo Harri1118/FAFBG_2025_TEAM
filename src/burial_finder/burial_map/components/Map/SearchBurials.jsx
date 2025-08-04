@@ -15,10 +15,10 @@ import geo_burials from '../../../../data/Geo_Burials.json'
  import RemoveIcon from '@mui/icons-material/Remove';
 import TourFilter from "../Tour/TourFilter";
 import CloseIcon from '@mui/icons-material/Close';
-
+import * as turf from '@turf/turf';  // Geospatial calculations library
 import PinDropIcon from '@mui/icons-material/PinDrop';
 
-const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refStatus, selectedTour: refSelectedTour, hoveredIndex: refHoveredIndex, showAllBurials: refShowAllBurials, lat:refLat, lng:refLng, sectionFilter: refSectionFilter, watchId: refWatchId, overlayMaps: refOverlayMaps}) => {
+const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSelectedTour, hoveredIndex: refHoveredIndex, showAllBurials: refShowAllBurials, lat:refLat, lng:refLng, sectionFilter: refSectionFilter, watchId: refWatchId, overlayMaps: refOverlayMaps, updateSelectedBurials, updateSelectedTour, includesTour}) => {
         const [inputValue, setInputValue] = useState('');
       const [selectedBurials, setSelectedBurials] = useState(refSelectedBurials);
       const [currentSelection, setCurrentSelection] = useState(null);
@@ -30,10 +30,10 @@ const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refSt
          const [selectedTour, setSelectedTour] = useState(refSelectedTour);
            const [lat, setLat] = useState(refLat);
            const [lng, setLng] = useState(refLng);
-           const [watchId, setWatchId] = useState(refWatchId);
-           const [status, setStatus] = useState(refStatus);
+           const [watchId, setWatchId] = useState(null);
+           const [status, setStatus] = useState('Find me');
            const [hoveredIndex, setHoveredIndex] = useState(refHoveredIndex);
-
+            
 
           /**
          * Create searchable options from burial data
@@ -55,6 +55,7 @@ const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refSt
            */
           const handleTourSelect = useCallback((tourName) => {
             setSelectedTour(tourName);
+            updateSelectedTour(tourName);
           }, []);
 
             /**
@@ -78,6 +79,7 @@ const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refSt
      */
     const clearSearch = useCallback(() => {
       setSelectedBurials([]);
+      updateSelectedBurials([])
       setInputValue('');
       setCurrentSelection(null);
     }, []);
@@ -88,6 +90,7 @@ const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refSt
     const addToResults = useCallback((burial) => {
       if (burial && !selectedBurials.some(b => b.OBJECTID === burial.OBJECTID)) {
         setSelectedBurials(prev => [...prev, burial]);
+        updateSelectedBurials(prev => [...prev,burial]);
         setCurrentSelection(null);
         setInputValue('');
         
@@ -121,6 +124,7 @@ const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refSt
      */
     const removeFromResults = useCallback((objectId) => {
       setSelectedBurials(prev => prev.filter(burial => burial.OBJECTID !== objectId));
+      updateSelectedBurials(prev => prev.filter(burial => burial.OBJECTID !== objectId));
     }, []);
 
   /**
@@ -169,6 +173,7 @@ const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refSt
   };
 
   return(
+    <div>
          <Paper 
         elevation={3}
         className="left-sidebar"
@@ -376,6 +381,7 @@ const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refSt
           )}
 
                     {/* Tour Filter */}
+          { includesTour == true && 
           <Box sx={{ mt: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
               Filter by Tour
@@ -386,7 +392,7 @@ const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refSt
               onTourSelect={handleTourSelect}
             />
           </Box>
-          
+            }
           {/* Location Button */}
           <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
             <Button 
@@ -497,6 +503,7 @@ const SearchBurials = ({turf, selectedBurials: refSelectedBurials, status: refSt
           </Box>
         )}
         </Paper>
+        </div>
   )
 }
 export default SearchBurials;

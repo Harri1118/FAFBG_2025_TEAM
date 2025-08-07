@@ -18,7 +18,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import * as turf from '@turf/turf';  // Geospatial calculations library
 import PinDropIcon from '@mui/icons-material/PinDrop';
 
-const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSelectedTour, hoveredIndex: refHoveredIndex, showAllBurials: refShowAllBurials, lat:refLat, lng:refLng, sectionFilter: refSectionFilter, watchId: refWatchId, overlayMaps: refOverlayMaps, updateSelectedBurials, updateSelectedTour, includesTour}) => {
+const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSelectedTour, hoveredIndex: refHoveredIndex, showAllBurials: refShowAllBurials, lat:refLat, lng:refLng, sectionFilter: refSectionFilter, overlayMaps: refOverlayMaps, updateSelectedBurials, updateSelectedTour, includesTour, updateSectionFilter, updateShowAllBurials}) => {
         const [inputValue, setInputValue] = useState('');
       const [selectedBurials, setSelectedBurials] = useState(refSelectedBurials);
       const [currentSelection, setCurrentSelection] = useState(null);
@@ -268,8 +268,10 @@ const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSe
               value={sectionFilter || null}
               onChange={(event, newValue) => {
                 setSectionFilter(newValue || '');
+                updateSectionFilter(sectionFilter)
                 if (newValue && !showAllBurials) {
                   setShowAllBurials(true);
+                  updateShowAllBurials(showAllBurials)
                 }
                 if (newValue && window.mapInstance) {
                   // Find the section in ARC_Sections and zoom to it
@@ -309,7 +311,9 @@ const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSe
                 color="primary"
                 size="small"
                 fullWidth
-                onClick={() => setShowAllBurials(!showAllBurials)}
+                onClick={() => {setShowAllBurials(!showAllBurials)
+                updateShowAllBurials(showAllBurials)}
+                }
                 startIcon={showAllBurials ? <RemoveIcon /> : <AddIcon />}
               >
                 {showAllBurials ? 'Hide Section Burials' : 'Show Section Burials'}
@@ -364,7 +368,9 @@ const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSe
                   setLotTierFilter('');
                   setFilterType('lot');
                   setSectionFilter('');
+                  updateSectionFilter(sectionFilter)
                   setShowAllBurials(false);
+                  updateShowAllBurials(showAllBurials)
                   // Reset map view to original bounds
                   if (window.mapInstance) {
                     const bounds = turf.bbox(ARC_Boundary.features[0]);
@@ -389,6 +395,7 @@ const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSe
             <TourFilter 
               overlayMaps={overlayMaps} 
               setShowAllBurials={setShowAllBurials} 
+              updateShowAllBurials={updateShowAllBurials}
               onTourSelect={handleTourSelect}
             />
           </Box>

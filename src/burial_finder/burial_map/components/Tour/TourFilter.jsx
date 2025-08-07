@@ -5,13 +5,16 @@ import { TOURS } from "../../utils/constants";
  /**
  * Component for filtering and selecting cemetery tours
  */
-function TourFilter({ overlayMaps, setShowAllBurials, onTourSelect }) {
+function TourFilter({ overlayMaps, setShowAllBurials, onTourSelect, updateShowAllBurials }) {
   return (
     <Autocomplete
        options={TOUR_DATA}
       getOptionLabel={(option) => option.name}
       onChange={(event, newValue) => {
         setShowAllBurials(true);
+        if(updateShowAllBurials){
+          updateShowAllBurials(true);
+        }
         const tourName = newValue ? newValue.name : null;
         onTourSelect(tourName);
       }}

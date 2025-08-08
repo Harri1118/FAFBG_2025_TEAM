@@ -3,7 +3,6 @@ import { Autocomplete, Box, IconButton, Button, Paper, TextField, Typography, In
 import SearchIcon from '@mui/icons-material/Search';
  import L from 'leaflet';  // Core Leaflet library for map functionality
  import {ZOOM_LEVELS, TOURS, DEFAULT_ZOOM_LEVEL} from '../../utils/constants'
- import ARC_Sections from "../../../../data/ARC_Boundary.json";
 import { useCallback, useEffect, useMemo, useState } from "react";
  import { createUniqueKey, smartSearch } from "../../utils/helperFunctions";
 import geo_burials from '../../../../data/Geo_Burials.json'
@@ -11,6 +10,7 @@ import geo_burials from '../../../../data/Geo_Burials.json'
  import { MARKER_COLORS } from "../../utils/constants";
  import AddIcon from '@mui/icons-material/Add';
  import ARC_Boundary from "../../../../data/ARC_Boundary.json"
+ import ARC_Sections from "../../../../data/ARC_Sections.json";
 // import CloseIcon from '@mui/icons-material/Close';
  import RemoveIcon from '@mui/icons-material/Remove';
 import TourFilter from "../Tour/TourFilter";
@@ -18,7 +18,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import * as turf from '@turf/turf';  // Geospatial calculations library
 import PinDropIcon from '@mui/icons-material/PinDrop';
 
-const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSelectedTour, hoveredIndex: refHoveredIndex, showAllBurials: refShowAllBurials, lat:refLat, lng:refLng, sectionFilter: refSectionFilter, overlayMaps: refOverlayMaps, updateSelectedBurials, updateSelectedTour, includesTour, updateSectionFilter, updateShowAllBurials}) => {
+const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSelectedTour, hoveredIndex: refHoveredIndex, showAllBurials: refShowAllBurials, lat:refLat, lng:refLng, sectionFilter: refSectionFilter, overlayMaps: refOverlayMaps, updateSelectedBurials, updateSelectedTour, includesTour, updateSectionFilter, updateShowAllBurials, window}) => {
         const [inputValue, setInputValue] = useState('');
       const [selectedBurials, setSelectedBurials] = useState(refSelectedBurials);
       const [currentSelection, setCurrentSelection] = useState(null);
@@ -34,7 +34,6 @@ const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSe
            const [status, setStatus] = useState('Find me');
            const [hoveredIndex, setHoveredIndex] = useState(refHoveredIndex);
             
-
           /**
          * Create searchable options from burial data
          * Includes name, section, lot, and tour information
@@ -268,10 +267,11 @@ const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSe
               value={sectionFilter || null}
               onChange={(event, newValue) => {
                 setSectionFilter(newValue || '');
-                updateSectionFilter(sectionFilter)
+                updateSectionFilter(newValue || '')
+                
                 if (newValue && !showAllBurials) {
                   setShowAllBurials(true);
-                  updateShowAllBurials(showAllBurials)
+                  updateShowAllBurials(true)
                 }
                 if (newValue && window.mapInstance) {
                   // Find the section in ARC_Sections and zoom to it
@@ -312,7 +312,7 @@ const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSe
                 size="small"
                 fullWidth
                 onClick={() => {setShowAllBurials(!showAllBurials)
-                updateShowAllBurials(showAllBurials)}
+                updateShowAllBurials(!showAllBurials)}
                 }
                 startIcon={showAllBurials ? <RemoveIcon /> : <AddIcon />}
               >
@@ -370,7 +370,7 @@ const SearchBurials = ({selectedBurials: refSelectedBurials, selectedTour: refSe
                   setSectionFilter('');
                   updateSectionFilter(sectionFilter)
                   setShowAllBurials(false);
-                  updateShowAllBurials(showAllBurials)
+                  updateShowAllBurials(false)
                   // Reset map view to original bounds
                   if (window.mapInstance) {
                     const bounds = turf.bbox(ARC_Boundary.features[0]);

@@ -157,7 +157,6 @@ export default function BurialMap() {
    * Filter burials based on section/lot/tier criteria
    */
   const filteredBurials = useMemo(() => {
-    console.log(sectionFilter)
     if (!showAllBurials || !sectionFilter) return [];
     
     return geo_burials.features.filter(feature => {
@@ -489,6 +488,7 @@ export default function BurialMap() {
       updateShowAllBurials={setShowAllBurials}
       overlayMaps={overlayMaps}
       includesTour={true}
+      window={window}
       />
 
       <MapContainer

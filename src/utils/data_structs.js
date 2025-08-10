@@ -1,20 +1,20 @@
 // Local Data and Styles
-import geo_burials from "../../../data/Geo_Burials.json";
-import Sec75_Headstones from "../../../data/Projected_Sec75_Headstones.json";
-import Sec49_Headstones from "../../../data/Projected_Sec49_Headstones.json";
+import geo_burials from "data/Geo_Burials.json";
+import Sec75_Headstones from "data/Projected_Sec75_Headstones.json";
+import Sec49_Headstones from "data/Projected_Sec49_Headstones.json";
 
 // Tour Data Imports
-import NotablesTour from "../../../data/NotablesTour20.json";
-import IndependenceTour from "../../../data/IndependenceTour20.json";
-import AfricanAmericanTour from "../../../data/AfricanAmericanTour20.json";
-import ArtistTour from "../../../data/ArtistTour20.json";
-import AssociationsTour from "../../../data/AssociationsTour20.json";
-import AuthorsTour from "../../../data/AuthorsPublishersTour20.json";
-import BusinessTour from "../../../data/BusinessFinanceTour20.json";
-import CivilWarTour from "../../../data/CivilWarTour20.json";
-import PillarsTour from "../../../data/SocietyPillarsTour20.json";
-import MayorsTour from "../../../data/AlbanyMayors_fixed.json";
-import GARTour from "../../../data/GAR_fixed.json";
+import NotablesTour from "data/NotablesTour20.json";
+import IndependenceTour from "data/IndependenceTour20.json";
+import AfricanAmericanTour from "data/AfricanAmericanTour20.json";
+import ArtistTour from "data/ArtistTour20.json";
+import AssociationsTour from "data/AssociationsTour20.json";
+import AuthorsTour from "data/AuthorsPublishersTour20.json";
+import BusinessTour from "data/BusinessFinanceTour20.json";
+import CivilWarTour from "data/CivilWarTour20.json";
+import PillarsTour from "data/SocietyPillarsTour20.json";
+import MayorsTour from "data/AlbanyMayors_fixed.json";
+import GARTour from "data/GAR_fixed.json";
 /**
  * Array of unique section numbers from the burial data
  * Sorted numerically with special handling for section 100A

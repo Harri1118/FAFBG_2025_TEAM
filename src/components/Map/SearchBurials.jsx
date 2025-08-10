@@ -2,18 +2,18 @@ import { Autocomplete, Box, IconButton, Button, Paper, TextField, Typography, In
 // import LocationButton from "./LocationButton";
 import SearchIcon from '@mui/icons-material/Search';
  import L from 'leaflet';  // Core Leaflet library for map functionality
- import {ZOOM_LEVELS, TOURS, DEFAULT_ZOOM_LEVEL} from '../../utils/constants'
+ import {ZOOM_LEVELS, TOURS, DEFAULT_ZOOM_LEVEL} from 'utils/constants'
 import { useCallback, useEffect, useMemo, useState } from "react";
- import { createUniqueKey, smartSearch } from "../../utils/helperFunctions";
-import geo_burials from '../../../../data/Geo_Burials.json'
- import { UNIQUE_SECTIONS } from "../../utils/data_structs";
- import { MARKER_COLORS } from "../../utils/constants";
+ import { createUniqueKey, smartSearch } from "utils/helperFunctions";
+import geo_burials from 'data/Geo_Burials.json'
+ import { UNIQUE_SECTIONS } from "utils/data_structs";
+ import { MARKER_COLORS } from "utils/constants";
  import AddIcon from '@mui/icons-material/Add';
- import ARC_Boundary from "../../../../data/ARC_Boundary.json"
- import ARC_Sections from "../../../../data/ARC_Sections.json";
+ import ARC_Boundary from "data/ARC_Boundary.json"
+ import ARC_Sections from "data/ARC_Sections.json";
 // import CloseIcon from '@mui/icons-material/Close';
  import RemoveIcon from '@mui/icons-material/Remove';
-import TourFilter from "../Tour/TourFilter";
+import TourFilter from "components/Tour/TourFilter";
 import CloseIcon from '@mui/icons-material/Close';
 import * as turf from '@turf/turf';  // Geospatial calculations library
 import PinDropIcon from '@mui/icons-material/PinDrop';

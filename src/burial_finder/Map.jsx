@@ -38,33 +38,33 @@ import CloseIcon from '@mui/icons-material/Close';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 // Local Data and Styles
-import geo_burials from "../../data/Geo_Burials.json";
-import ARC_Roads from "../../data/ARC_Roads.json";
-import ARC_Boundary from "../../data/ARC_Boundary.json";
-import ARC_Sections from "../../data/ARC_Sections.json";
+import geo_burials from "data/Geo_Burials.json";
+import ARC_Roads from "data/ARC_Roads.json";
+import ARC_Boundary from "data/ARC_Boundary.json";
+import ARC_Sections from "data/ARC_Sections.json";
 
 // Constants
-import {DEFAULT_ZOOM_LEVEL, ZOOM_LEVELS, MARKER_COLORS, TOURS} from '../burial_map/utils/constants'
+import {DEFAULT_ZOOM_LEVEL, ZOOM_LEVELS, MARKER_COLORS, TOURS} from 'utils/constants'
 
 // Components
-import CustomZoomControl from '../burial_map/components/Map/ZoomControl';
-import MapBounds from '../burial_map/components/Map/MapBounds'
-import VectorBasemap from "./components/Map/VectorBasemap";
-import MapController from "./components/Map/MapController";
-import DefaultExtentButton from "./components/Map/DefaultExtentButton";
-import RoutingControl from "./components/Map/RoutingControl"
+import CustomZoomControl from 'components/Map/ZoomControl';
+import MapBounds from 'components/Map/MapBounds'
+import VectorBasemap from "components/Map/VectorBasemap";
+import MapController from "components/Map/MapController";
+import DefaultExtentButton from "components/Map/DefaultExtentButton";
+import RoutingControl from "components/Map/RoutingControl"
 
 // Tour components
-import TourFilter from './components/Tour/TourFilter'
-import MapTourController from "./components/Tour/MapTourController";
-import CreateOnEachTourFeature from "./components/Tour/CreateOnEachTourFeature";
+import TourFilter from 'components/Tour/TourFilter'
+import MapTourController from "components/Tour/MapTourController";
+import CreateOnEachTourFeature from "components/Tour/CreateOnEachTourFeature";
 
 // Helper functions
-import {createNumberedIcon, createUniqueKey, getImagePath, createTourMarker, createTourPopupContent, smartSearch} from "../burial_map/utils/helperFunctions"
+import {createNumberedIcon, createUniqueKey, getImagePath, createTourMarker, createTourPopupContent, smartSearch} from "utils/helperFunctions"
 
 // Data structures
-import { UNIQUE_SECTIONS, TOUR_DATA } from "./utils/data_structs";
-import SearchBurials from "./components/Map/SearchBurials";
+import { UNIQUE_SECTIONS, TOUR_DATA } from "utils/data_structs";
+import SearchBurials from "components/Map/SearchBurials";
 
 // Memoized Values
 // import searchOptionsMemo from "./utils/memoizedValues";

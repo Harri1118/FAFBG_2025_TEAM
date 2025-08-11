@@ -1,33 +1,11 @@
 import React from 'react';
-import '../assets/css/main.css'
+//import styles from 'assets/css/main.css'
+import Navbar from 'components/Web/navbar';
+import Footer from 'components/Web/footer';
 function Home(){
     return (
-        <>
-
-        {/* Header */}
-        <header id="header" className="special">
-    <h1>
-      <strong>
-        <a href="index.html">ARCE:</a>
-      </strong>{" "}
-      Albany Rural Cemetery Explorer
-    </h1>
-    <nav id="nav">
-      <ul>
-        <li>
-          <a href="index.html">Home</a>
-        </li>
-        <li>
-          <a href="explore.html">Explore</a>
-        </li>
-        <li>
-          <a href="ttp://albanyruralcemetery.org/about-arc/contact-us/">
-            Feedback
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </header>
+      <>
+ <Navbar/>
         {/* Banner */}
         <section id="banner">
           <h2>ALBANY RURAL CEMETERY Explorer</h2>
@@ -215,30 +193,7 @@ function Home(){
             </ul>
           </div>
         </section>
-        {/* Footer */}
-        <footer id="footer">
-          <div className="container">
-            {/* 
-                          <ul class="icons">
-                              <li><a href="#" class="icon fa-facebook"></a></li>
-                              <li><a href="#" class="icon fa-twitter"></a></li>
-                              <li><a href="#" class="icon fa-instagram"></a></li>
-                          </ul>
-                          */}
-            <ul className="copyright">
-              <li>
-                A collaborative project between Geography and Planning, University at
-                Albany SUNY and Albany Rural Cemetery, funded by the Bender Family
-                Foundation
-              </li>
-              <li>© 2019 All Rights Reserved</li>
-              <li>
-                Styles adpated from <a href="http://templated.co">TEMPLATED</a>
-              </li>
-              {/* <li>Images: <a href="http://unsplash.com">Unsplash</a></li> */}
-            </ul>
-          </div>
-        </footer>
+            <Footer/>
         {/* Scripts */}
         {/* Default Statcounter code for Albany.edu Arce http://albany.edu/arce/ */}
         <span className="statcounter">
@@ -313,7 +268,9 @@ function Home(){
             style={{ WebkitTapHighlightColor: "rgba(0, 0, 0, 0)" }}
           />
         </div>
-      </>      
+        </>
         );
 }
 export default Home;
+
+ 

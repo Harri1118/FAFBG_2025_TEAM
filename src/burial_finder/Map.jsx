@@ -14,6 +14,7 @@
 // React and Core Dependencies
 import { React, useState, useEffect, useMemo, useRef, useCallback } from "react";
 
+
 // Leaflet and Map-related Dependencies
 import { MapContainer, Popup, Marker, GeoJSON, LayersControl, LayerGroup, useMap } from "react-leaflet";
 import L from 'leaflet';  // Core Leaflet library for map functionality
@@ -473,9 +474,9 @@ export default function BurialMap() {
   }, [tourCallbacks, onEachSection]);
 
   return (
-    <div className="map-container">
+    <div className="map-container" >
       {/* Left sidebar with search and filters */}
-      <SearchBurials 
+                    <SearchBurials 
       selectedBurials={selectedBurials}
       updateSelectedBurials={setSelectedBurials}
       updateSelectedTour={setSelectedTour}
@@ -490,14 +491,15 @@ export default function BurialMap() {
       includesTour={true}
       window={window}
       />
-
-      <MapContainer
+            <MapContainer
         center={[42.704180, -73.731980]}
         zoom={14}
         className="map"
         zoomControl={false}
         maxZoom={25}
       >
+
+
         <CustomZoomControl />
         <DefaultExtentButton />
         <MapBounds />

@@ -1,5 +1,5 @@
-import Footer from "components/Web/footer";
-import Navbar from "components/Web/navbar";
+import Footer from "shared/components/Web/footer";
+import Navbar from "shared/components/Web/navbar";
 function About(){
     return(
         <div>

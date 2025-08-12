@@ -1,6 +1,5 @@
-const { default: Footer } = require("components/Web/footer");
-const { default: Navbar } = require("components/Web/navbar");
-
+import Navbar from "shared/components/Web/navbar"
+import Footer from "shared/components/Web/footer"
 function NotableGraves(){
     return (
         <div>

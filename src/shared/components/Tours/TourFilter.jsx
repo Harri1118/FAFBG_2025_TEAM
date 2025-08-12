@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { Box } from "@mui/system";
-import { TOUR_DATA } from "../../utils/data_structs";
-import { TOURS } from "../../utils/constants";
+import { TOUR_DATA } from "shared/utils/data_structs";
+import { TOURS } from "shared/utils/constants";
  /**
  * Component for filtering and selecting cemetery tours
  */

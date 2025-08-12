@@ -1,5 +1,5 @@
-import Navbar from 'components/Web/navbar'
-import Footer from 'components/Web/footer'
+import Navbar from 'shared/components/Web/navbar'
+import Footer from 'shared/components/Web/footer'
 
 function LocateBurialsOrGraves(){
     return (

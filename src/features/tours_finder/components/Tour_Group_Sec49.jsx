@@ -1,7 +1,7 @@
 import { LayerGroup, LayersControl, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
-import data from "../data/Projected_Sec49_Headstones.json"
-import objects from "../data/Sec49WithNames.json"
+import data from "shared/data/Projected_Sec49_Headstones.json"
+import objects from "shared/data/Sec49WithNames.json"
 
 const ToursGroupIterative = () => {
     const pointStyle = {

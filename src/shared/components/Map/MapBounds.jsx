@@ -1,5 +1,5 @@
 import { useMap } from "react-leaflet";
-import ARC_Boundary from "data/ARC_Boundary.json";
+import ARC_Boundary from "shared/data/ARC_Boundary.json";
 import { useEffect } from "react";
 import * as turf from '@turf/turf';
 /**

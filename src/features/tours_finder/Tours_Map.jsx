@@ -17,7 +17,7 @@ import { React, useState, useEffect, useMemo, useRef, useCallback } from "react"
 // Leaflet and Map-related Dependencies
 import { MapContainer, Popup, Marker, GeoJSON, LayersControl, LayerGroup, useMap } from "react-leaflet";
 import L from 'leaflet';  // Core Leaflet library for map functionality
-import "../styling/index.css";
+import "assets/css/index.css";
 import 'leaflet.markercluster/dist/leaflet.markercluster';  // Clustering support for markers
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -26,8 +26,8 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'lrm-graphhopper';  // GraphHopper routing integration
 import * as turf from '@turf/turf';  // Geospatial calculations library
 import { BasemapLayer } from 'react-esri-leaflet';  // ESRI basemap integration
-import TourGroup from "./Tour_Group";
-import ToursGroupIterative from "./Tour_Group_Sec49"
+import TourGroup from "./components/Tour_Group";
+import ToursGroupIterative from "./components/Tour_Group_Sec49"
 // Material-UI Components and Icons
 import { 
   Autocomplete, TextField, Paper, InputAdornment, IconButton,
@@ -43,29 +43,29 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import HomeIcon from '@mui/icons-material/Home';
 
 // Local Data and Styles
-import geo_burials from "../data/Geo_Burials.json";
-import ARC_Roads from "../data/ARC_Roads.json";
-import ARC_Boundary from "../data/ARC_Boundary.json";
-import ARC_Sections from "../data/ARC_Sections.json";
-import Sec75_Headstones from "../data/Projected_Sec75_Headstones.json";
-import Sec49_Headstones from "../data/Projected_Sec49_Headstones.json";
+import geo_burials from "shared/data/Geo_Burials.json";
+import ARC_Roads from "shared/data/ARC_Roads.json";
+import ARC_Boundary from "shared/data/ARC_Boundary.json";
+import ARC_Sections from "shared/data/ARC_Sections.json";
+import Sec75_Headstones from "shared/data/Projected_Sec75_Headstones.json";
+import Sec49_Headstones from "shared/data/Projected_Sec49_Headstones.json";
 
 // Tour Data Imports
-import NotablesTour from "../data/NotablesTour20.json";
-import IndependenceTour from "../data/IndependenceTour20.json";
-import AfricanAmericanTour from "../data/AfricanAmericanTour20.json";
-import ArtistTour from "../data/ArtistTour20.json";
-import AssociationsTour from "../data/AssociationsTour20.json";
-import AuthorsTour from "../data/AuthorsPublishersTour20.json";
-import BusinessTour from "../data/BusinessFinanceTour20.json";
-import CivilWarTour from "../data/CivilWarTour20.json";
-import PillarsTour from "../data/SocietyPillarsTour20.json";
-import MayorsTour from "../data/AlbanyMayors_fixed.json";
-import GARTour from "../data/GAR_fixed.json";
-import Lot7 from "../data/Projected_Sec75_Headstones.json"
-import Tour_Group_Iterative from "./Tour_Group_Sec49";
+import NotablesTour from "shared/data/NotablesTour20.json";
+import IndependenceTour from "shared/data/IndependenceTour20.json";
+import AfricanAmericanTour from "shared/data/AfricanAmericanTour20.json";
+import ArtistTour from "shared/data/ArtistTour20.json";
+import AssociationsTour from "shared/data/AssociationsTour20.json";
+import AuthorsTour from "shared/data/AuthorsPublishersTour20.json";
+import BusinessTour from "shared/data/BusinessFinanceTour20.json";
+import CivilWarTour from "shared/data/CivilWarTour20.json";
+import PillarsTour from "shared/data/SocietyPillarsTour20.json";
+import MayorsTour from "shared/data/AlbanyMayors_fixed.json";
+import GARTour from "shared/data/GAR_fixed.json";
+import Lot7 from "shared/data/Projected_Sec75_Headstones.json"
+import Tour_Group_Iterative from "./components/Tour_Group_Sec49";
 
-import Modal from "./WebModal"
+import Modal from "./components/WebModal"
 //=============================================================================
 // Constants and Configuration
 //=============================================================================

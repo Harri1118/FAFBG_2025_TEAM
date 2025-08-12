@@ -1,4 +1,4 @@
-import { createTourPopupContent } from "../../utils/helperFunctions";
+import { createTourPopupContent } from "shared/utils/helperFunctions";
 /**
  * Creates event handlers for tour features
  * @param {string} tourKey - The key identifying the tour

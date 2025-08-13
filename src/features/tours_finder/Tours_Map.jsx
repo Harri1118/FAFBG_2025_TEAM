@@ -598,6 +598,9 @@ export default function ToursMap() {
   // Component References
   const { BaseLayer } = LayersControl;
 
+    useEffect(() => {
+        document.title = "Tours Navigator";
+      }, []);
    /**
      * Handle tour selection
      */
@@ -1213,5 +1216,6 @@ export default function ToursMap() {
         </LayersControl>
       </MapContainer>
     </div>
+
   );
 }

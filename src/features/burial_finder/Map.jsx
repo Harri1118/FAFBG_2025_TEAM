@@ -117,7 +117,7 @@ const markerStyle = {
  * - Real-time location tracking
  * - Turn-by-turn navigation to burial sites
  */
-export default function BurialMap() {
+export function BurialMap() {
   //-----------------------------------------------------------------------------
   // State Management
   //-----------------------------------------------------------------------------
@@ -656,3 +656,4 @@ export default function BurialMap() {
     </div>
   );
 }
+

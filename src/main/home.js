@@ -2,7 +2,7 @@ import React from 'react';
 //import styles from 'assets/css/main.css'
 import Navbar from 'shared/components/Web/navbar';
 import Footer from 'shared/components/Web/footer';
-function Home(){
+export default function Home(){
     return (
       <>
  <Navbar/>
@@ -270,7 +270,5 @@ function Home(){
         </div>
         </>
         );
-}
-export default Home;
-
+      }
  

@@ -48,24 +48,24 @@ import ARC_Sections from "shared/data/ARC_Sections.json";
 import {DEFAULT_ZOOM_LEVEL, ZOOM_LEVELS, MARKER_COLORS, TOURS} from 'shared/utils/constants'
 
 // Components
-import CustomZoomControl from 'shared/components/Map/ZoomControl';
-import MapBounds from 'shared/components/Map/MapBounds'
-import VectorBasemap from "shared/components/Map/VectorBasemap";
-import MapController from "shared/components/Map/MapController";
-import DefaultExtentButton from "shared/components/Map/DefaultExtentButton";
-import RoutingControl from "shared/components/Map/RoutingControl"
+import CustomZoomControl from 'shared/components/Map/ZoomControl.jsx';
+import MapBounds from 'shared/components/Map/MapBounds.jsx'
+import VectorBasemap from "shared/components/Map/VectorBasemap.jsx";
+import MapController from "shared/components/Map/MapController.jsx";
+import DefaultExtentButton from "shared/components/Map/DefaultExtentButton.jsx";
+import RoutingControl from "shared/components/Map/RoutingControl.jsx"
 
 // Tour components
-import TourFilter from 'shared/components/Tours/TourFilter'
-import MapTourController from "shared/components/Tours/MapTourController";
-import CreateOnEachTourFeature from "shared/components/Tours/CreateOnEachTourFeature";
+import TourFilter from 'shared/components/Tours/TourFilter.jsx'
+import MapTourController from "shared/components/Tours/MapTourController.jsx";
+import CreateOnEachTourFeature from "shared/components/Tours/CreateOnEachTourFeature.jsx";
 
 // Helper functions
-import {createNumberedIcon, createUniqueKey, getImagePath, createTourMarker, createTourPopupContent, smartSearch} from "shared/utils/helperFunctions"
+import {createNumberedIcon, createUniqueKey, getImagePath, createTourMarker, createTourPopupContent, smartSearch} from "shared/utils/helperFunctions.js"
 
 // Data structures
-import { UNIQUE_SECTIONS, TOUR_DATA } from "shared/utils/data_structs";
-import SearchBurials from "shared/components/Map/SearchBurials";
+import { UNIQUE_SECTIONS, TOUR_DATA } from "shared/utils/data_structs.js";
+import SearchBurials from "shared/components/Map/SearchBurials.jsx";
 
 // Memoized Values
 // import searchOptionsMemo from "./utils/memoizedValues";

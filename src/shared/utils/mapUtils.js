@@ -1,5 +1,5 @@
-import  geo_burials  from '../../../data/Geo_Burials.json';
-import { createTourPopupContent } from './popupUtils';
+import  geo_burials  from 'shared/data/Geo_Burials.json';
+import { createTourPopupContent } from './popupUtils.js';
 
 
 /**

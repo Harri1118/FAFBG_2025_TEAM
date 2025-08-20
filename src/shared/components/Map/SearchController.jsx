@@ -5,9 +5,9 @@
 
 import React, { useCallback, useState } from 'react';
 import * as turf from '@turf/turf' 
-import ARC_Boundary from '../../../../data/ARC_Boundary.json';
-import { smartSearch } from '../../shared/utils/searchUtils';
-import { ZOOM_LEVEL } from '../../constants'; // Import the ZOOM_LEVEL constant
+import ARC_Boundary from 'shared/data/ARC_Boundary.json';
+import { smartSearch } from 'shared/shared/utils/searchUtils.js';
+import { ZOOM_LEVEL } from 'shared/utils/constants.js'; // Import the ZOOM_LEVEL constant
 
 
 

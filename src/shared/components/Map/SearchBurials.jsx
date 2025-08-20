@@ -13,7 +13,7 @@ import geo_burials from 'shared/data/Geo_Burials.json'
  import ARC_Sections from "shared/data/ARC_Sections.json";
 // import CloseIcon from '@mui/icons-material/Close';
  import RemoveIcon from '@mui/icons-material/Remove';
-import TourFilter from "shared/components/Tours/TourFilter";
+import TourFilter from "shared/components/Tours/TourFilter.jsx";
 import CloseIcon from '@mui/icons-material/Close';
 import * as turf from '@turf/turf';  // Geospatial calculations library
 import PinDropIcon from '@mui/icons-material/PinDrop';

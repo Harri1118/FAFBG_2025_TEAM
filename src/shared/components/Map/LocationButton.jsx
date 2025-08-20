@@ -1,5 +1,5 @@
             import { Box, Button } from '@mui/material';
-            import ARC_Boundary from '../../../../data/ARC_Boundary.json'  
+            import ARC_Boundary from 'shared/data/ARC_Boundary.json'  
             import PinDropIcon from '@mui/icons-material/PinDrop';          
 import { useState } from 'react';
            const LocationButton = ({status: refStatus, watchId : refWatchId, turf, lat: refLat, lng: refLng}) => {

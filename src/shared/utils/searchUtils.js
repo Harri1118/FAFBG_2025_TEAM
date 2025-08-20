@@ -7,7 +7,7 @@
 
 import { useCallback } from "react";
 import L from "leaflet"
-import { TOURS } from './tourConfig';
+import { TOURS } from './tourConfig.js';
 
 const ZOOM_LEVEL = 18;
 /**

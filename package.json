@@ -63,6 +63,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-react": "^7.27.1",
+    "@testing-library/react": "^16.3.0",
     "babel-jest": "^29.7.0",
     "gh-pages": "^6.3.0",
     "identity-obj-proxy": "^3.0.0",

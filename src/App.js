@@ -1,12 +1,12 @@
-import {BurialMap} from 'features/burial_finder/Map';
-import Home from './main/home';
-import Explore from './main/explore';
+import {BurialMap} from 'features/burial_finder/Map.jsx';
+import Home from './main/home.js';
+import Explore from './main/explore.js';
 import { Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import About from 'main/about';
-import NotableGraves from 'main/notable_graves';
-import LocateBurialsOrGraves from 'main/locate_burials_or_graves';
-import ToursNav from 'features/tours_finder/Tours_Map';
+import About from 'main/about.js';
+import NotableGraves from 'main/notable_graves.js';
+import LocateBurialsOrGraves from 'main/locate_burials_or_graves.js';
+import ToursNav from 'features/tours_finder/Tours_Map.jsx';
 import './assets/css/App.css';
 
 // Test

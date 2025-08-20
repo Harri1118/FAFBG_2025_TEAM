@@ -1,4 +1,4 @@
-import { MARKER_COLORS, TOURS } from "./constants";
+import { MARKER_COLORS, TOURS } from "./constants.js";
 import L from 'leaflet';  // Core Leaflet library for map functionality
 /**
  * Creates a numbered marker icon for search results

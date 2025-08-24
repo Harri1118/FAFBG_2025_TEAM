@@ -1,5 +1,5 @@
 import React from 'react';
-//import styles from 'assets/css/main.css'
+import styles from 'assets/css/main.css'
 import Navbar from 'shared/components/Web/navbar';
 import Footer from 'shared/components/Web/footer';
 export default function Home(){

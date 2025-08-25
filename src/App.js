@@ -7,6 +7,7 @@ import About from 'main/about.js';
 import NotableGraves from 'main/notable_graves.js';
 import LocateBurialsOrGraves from 'main/locate_burials_or_graves.js';
 import ToursNav from 'features/tours_finder/Tours_Map.jsx';
+import BioList from 'main/bioList.js'
 import './assets/css/App.css';
 
 // Test
@@ -22,6 +23,7 @@ function App() {
           <Route path="/Locate_Burials&Graves" element={<LocateBurialsOrGraves />} />
           <Route path="/burialfinder" element={<BurialMap />} />
           <Route path="/Tours" element={<ToursNav />} />
+          <Route path="/biolist" element={<BioList/>}/>
           <Route path="*" element={<div>Not found</div>} />
         </Routes>
       </Suspense>

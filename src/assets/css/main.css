@@ -16,7 +16,7 @@
 		font-size: 100%;
 		font: inherit;
 		vertical-align:s baseline;
-		/* overflow-y: auto; */  /* Attribtue used which conflicts with mapping */
+		overflow-y: visible;  
 	}
 
 	article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
@@ -1570,7 +1570,8 @@
 
 	body {
 		background: #fff;
-		/* padding-top: 6em;  */ /* Attribute adds white bar to top */
+		/* padding-top: 6em;   */
+		/* Attribute adds white bar to top */
 	}
 
 		body.landing {

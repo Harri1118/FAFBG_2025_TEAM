@@ -500,7 +500,7 @@ export function BurialMap() {
       >
 
 
-        <CustomZoomControl />
+        <CustomZoomControl/>
         <DefaultExtentButton />
         <MapBounds />
         <MapController selectedBurials={selectedBurials} hoveredIndex={hoveredIndex} />

@@ -4,7 +4,7 @@ import Navbar from "shared/components/Web/navbar";
 function Explore() {
     return (
         <div style={{paddingTop: "6em"}}>
-            <Navbar />
+            <Navbar Title="Explore"/>
             <section id="main" className="wrapper">
                 <div className="container">
                     <header className="major">

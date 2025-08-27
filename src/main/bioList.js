@@ -1,9 +1,12 @@
 import React from 'react';
 import 'assets/css/main.css'; // Ensure this path is correct
+import Navbar from 'shared/components/Web/navbar';
+import Footer from 'shared/components/Web/footer';
 
 const Biographies = () => {
   return (
     <div>
+      <Navbar Title="Biographies"/>
       {/* Header */}
       <a href="#menu" className="navPanelToggle">
         <span className="fa fa-bars"></span>
@@ -28,7 +31,7 @@ const Biographies = () => {
       </section>
 
       
-    
+    <Footer/>
     </div>
   );
 };

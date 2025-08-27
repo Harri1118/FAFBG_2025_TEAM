@@ -4,7 +4,7 @@ import Footer from 'shared/components/Web/footer'
 function LocateBurialsOrGraves() {
     return (
         <div style={{paddingTop: "6em"}}>
-            <Navbar />
+            <Navbar Title="Locate Burials or Graves"/>
             <a href="#menu" className="navPanelToggle"><span className="fa fa-bars"></span></a>
 
             {/* Main */}

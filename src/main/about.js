@@ -4,7 +4,7 @@ import Navbar from "shared/components/Web/navbar";
 function About() {
     return (
         <div style={{paddingTop: "6em"}}>
-            <Navbar />
+            <Navbar Title="About us"/>
             <a href="#menu" className="navPanelToggle">
                 <span className="fa fa-bars"></span>
             </a>

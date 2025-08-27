@@ -1,7 +1,14 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-function Navbar() {
-
+function Navbar({Title: refTitle}) {
+  const [Title, setTitle] = useState(refTitle);
+  useEffect(() => {
+    if(Title)
+      document.title = Title + " - ARCE: Albany Rural Cemetary Explorer"
+    else
+      document.title = "ARCE: Albany Rural Cemetary Explorer"
+  },[Title])
   return (
     <>
       {/* Header */}

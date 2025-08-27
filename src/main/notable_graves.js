@@ -4,7 +4,7 @@ import Footer from "shared/components/Web/footer"
 function NotableGraves() {
     return (
         <div style={{paddingTop: "6em"}}>
-            <Navbar />
+            <Navbar Title="Notable Graves"/>
             <a href="#menu" className="navPanelToggle"><span className="fa fa-bars"></span></a>
             <section id="main" className="wrapper">
                 <div className="container">

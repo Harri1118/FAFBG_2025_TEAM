@@ -2,6 +2,7 @@ import React from 'react';
 import styles from 'assets/css/main.css'
 import Navbar from 'shared/components/Web/navbar';
 import Footer from 'shared/components/Web/footer';
+import { Link } from '@mui/material';
 export default function Home(){
     return (
       <>
@@ -222,12 +223,13 @@ export default function Home(){
         <div id="navPanel">
           <ul>
             <li>
-              <a
+              {/* <a
                 href="/explore"
                 style={{ WebkitTapHighlightColor: "rgba(0, 0, 0, 0)" }}
               >
                 explore
-              </a>
+              </a> */}
+              <Link to="/explore" style={{ WebkitTapHighlightColor: "rgba(0, 0, 0, 0)" }}>explore</Link>
             </li>
             <li>
               <a

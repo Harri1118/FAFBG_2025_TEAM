@@ -4,7 +4,7 @@ import Footer from "shared/components/Web/footer"
 function BurialFinderTutorial() {
   return (
     <>
-      <Navbar />
+      <Navbar Title={"Burial Finder Tutorial"}/>
       <a href="#menu" className="navPanelToggle">
         <span className="fa fa-bars" />
       </a>

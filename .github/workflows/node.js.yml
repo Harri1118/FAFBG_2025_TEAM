@@ -28,10 +28,10 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         uses: pressidium/lftp-mirror-action@v1
         with:
-          host: ${{ secrets.SFTP_URL_DEV }}
-          port: ${{ secrets.SFTP_PORT_DEV }}
-          user: ${{ secrets.SFTP_USER_DEV }}
-          pass: ${{ secrets.SFTP_PASSWORD_DEV }}
+          host: ${{ secrets.SFTP_URL }}
+          port: ${{ secrets.SFTP_PORT }}
+          user: ${{ secrets.SFTP_USER }}
+          pass: ${{ secrets.SFTP_PASSWORD }}
           localDir: './build'
           remoteDir: './wwwres/arce/production'
           reverse: true
@@ -39,10 +39,10 @@ jobs:
         if: github.ref == 'refs/heads/staging'
         uses: pressidium/lftp-mirror-action@v1
         with:
-          host: ${{ secrets.SFTP_URL_STAGING }}
-          port: ${{ secrets.SFTP_PORT_STAGING }}
-          user: ${{ secrets.SFTP_USER_STAGING }}
-          pass: ${{ secrets.SFTP_PASSWORD_STAGING }}
+          host: ${{ secrets.SFTP_URL }}
+          port: ${{ secrets.SFTP_PORT }}
+          user: ${{ secrets.SFTP_USER }}
+          pass: ${{ secrets.SFTP_PASSWORD }}
           localDir: './build'
           remoteDir: './wwwres/arce/staging'
           reverse: true
@@ -50,10 +50,10 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: pressidium/lftp-mirror-action@v1
         with:
-          host: ${{ secrets.SFTP_URL_PROD }}
-          port: ${{ secrets.SFTP_PORT_PROD }}
-          user: ${{ secrets.SFTP_USER_PROD }}
-          pass: ${{ secrets.SFTP_PASSWORD_PROD }}
+          host: ${{ secrets.SFTP_URL }}
+          port: ${{ secrets.SFTP_PORT }}
+          user: ${{ secrets.SFTP_USER }}
+          pass: ${{ secrets.SFTP_PASSWORD }}
           localDir: './build'
           remoteDir: './wwwres/arce/dev'
           reverse: true

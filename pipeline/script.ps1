@@ -4,8 +4,7 @@ $currentBranch = git rev-parse --abbrev-ref HEAD
 Write-Host "You are on branch: $currentBranch"
 # Test is path build exists, if it doesn't, build it
 Test-Path -Path "../build"
-$pth = "../build"
-$files = dir $pth
+$localPath = "../build"
 # Collect server addr and path from env variables.
 # Read .env file into a hashtable
 $envFile = Get-Content ".env" | Where-Object {$_ -match "="} |
@@ -20,8 +19,6 @@ foreach ($item in $envFile) {
 }
 $Link = $envDict["LINK"]
 $Path = $envDict["PATH"]
-$Link
-$Path
 # foreach ($file in $files) {
 #     Write-Host $file.Name
 # }
@@ -30,21 +27,32 @@ $Path
 $credential = New-Object System.Management.Automation.PSCredential (Get-Credential)
 $sftpSession = New-SFTPSession -ComputerName $Link -Credential $credential
 # Navigate to sftp path for uploading the files
+$remoteDir = ""
+$remotePath = ""
 if($currentBranch -eq "main"){
-    Get-SFTPChildItem -SFTPSession $sftpSession -Path $Path
+    $remotePath = "$Path"
 }
 else{
-    Get-SFTPChildItem -SFTPSession $sftpSession -Path "$Path$currentBranch"
+    $remotePath = "$Path$currentBranch"
 }
+$remoteDir = Get-SFTPChildItem -SFTPSession $sftpSession -Path $remotePath
 
 # Upload directory contents recursively
 Get-ChildItem -Path $localPath -Recurse | ForEach-Object {
     $localFile  = $_.FullName
-    $remoteFile = Join-Path $remotePath ($_.FullName.Substring($localPath.Length) -replace '\\','/')
-
+    # need to remove bath 
+    $relativePath = $_.FullName.Substring($localPath.Length).TrimStart('\')
+    $remoteFile   = (Join-Path $remotePath $relativePath) -replace '\\','/'
+    # Use Test-Path to check if the directory exists
+    if (Test-Path -Path $remotePath -PathType Container) {
+        Write-Host "The directory '$remotePath' exists."
+    } else {
+        Write-Host "The directory '$remotePath' does not exist."
+    }
     if (-not $_.PSIsContainer) {
+        $remoteFile
         Write-Host "Uploading $localFile to $remoteFile"
-        Set-SFTPFile -SFTPSession $sftpSession -LocalFile $localFile -RemotePath $remoteFile -Confirm:$false
+        Set-SFTPItem -Session $sftpSession.SessionID -Destination $remotePath -Path $localFile -verbose -force
     }
 }
 Remove-SFTPSession -SFTPSession $sftpSession

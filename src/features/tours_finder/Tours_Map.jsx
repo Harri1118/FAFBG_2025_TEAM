@@ -66,6 +66,7 @@ import Lot7 from "shared/data/Projected_Sec75_Headstones.json"
 import Tour_Group_Iterative from "./components/Tour_Group_Sec49";
 
 import Modal from "./components/WebModal"
+//import Styles from "../../assets/css/map.css"
 //=============================================================================
 // Constants and Configuration
 //=============================================================================
@@ -571,6 +572,7 @@ export default function ToursMap() {
   //-----------------------------------------------------------------------------
   
   // Map and UI State
+  const [loaded, setLoaded] = useState(false);
   const [overlayMaps, setOverlayMaps] = useState({});
   const [currentZoom, setCurrentZoom] = useState(14);
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -601,6 +603,13 @@ export default function ToursMap() {
     useEffect(() => {
         document.title = "Tours Navigator";
       }, []);
+
+  useEffect(() => {
+    const links = document.querySelectorAll('link[rel="stylesheet"]');
+    links.forEach(link => {
+      if (link.href.includes("main.css")) link.remove();
+    });
+  }, []);
    /**
      * Handle tour selection
      */
@@ -779,7 +788,7 @@ export default function ToursMap() {
     )
   }
   return (
-    <div className="map-container">
+    <div className="map-container" >
       <Paper 
         elevation={3}
         className="left-sidebar"

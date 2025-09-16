@@ -1,12 +1,13 @@
 import React from 'react';
-import styles from 'assets/css/main.css'
 import Navbar from 'shared/components/Web/navbar';
 import Footer from 'shared/components/Web/footer';
 import { Link } from '@mui/material';
+//import "../assets/css/main.css"
 export default function Home(){
     return (
       <>
  <Navbar/>
+ <div className="pageClass">
         {/* Banner */}
         <section id="banner">
           <h2>ALBANY RURAL CEMETERY Explorer</h2>
@@ -270,7 +271,9 @@ export default function Home(){
             style={{ WebkitTapHighlightColor: "rgba(0, 0, 0, 0)" }}
           />
         </div>
+        </div>
         </>
+        
         );
       }
  

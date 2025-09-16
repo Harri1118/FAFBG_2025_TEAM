@@ -62,11 +62,11 @@ import CreateOnEachTourFeature from "shared/components/Tours/CreateOnEachTourFea
 
 // Helper functions
 import {createNumberedIcon, createUniqueKey, getImagePath, createTourMarker, createTourPopupContent, smartSearch} from "shared/utils/helperFunctions.js"
-
+  import "../../assets/css/map.css"
 // Data structures
 import { UNIQUE_SECTIONS, TOUR_DATA } from "shared/utils/data_structs.js";
 import SearchBurials from "shared/components/Map/SearchBurials.jsx";
-
+//import "../../assets/css/map.css"
 // Memoized Values
 // import searchOptionsMemo from "./utils/memoizedValues";
 
@@ -144,6 +144,7 @@ export function BurialMap() {
   const [routingDestination, setRoutingDestination] = useState(null);
   const [watchId, setWatchId] = useState(null);
 
+
   // Component References
   const { BaseLayer } = LayersControl;
   const markerClusterRef = useRef(null);
@@ -153,6 +154,8 @@ export function BurialMap() {
   //-----------------------------------------------------------------------------
 
  
+    // Conditionally import CSS based on the route
+
 
   /**
    * Filter burials based on section/lot/tier criteria
@@ -315,6 +318,7 @@ export function BurialMap() {
     };
   }, []);
 
+
   /**
    * Update filtered burials marker display
    */
@@ -474,7 +478,7 @@ export function BurialMap() {
   }, [tourCallbacks, onEachSection]);
 
   return (
-    <div className="map-container" >
+    <div className="map-container" style={{overflowY: "visible"}}>
       {/* Left sidebar with search and filters */}
                     <SearchBurials 
       selectedBurials={selectedBurials}

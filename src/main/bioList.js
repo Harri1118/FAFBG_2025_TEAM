@@ -1,5 +1,5 @@
 import React from 'react';
-import 'assets/css/main.css'; // Ensure this path is correct
+//import 'assets/css/main.css'; // Ensure this path is correct
 import Navbar from 'shared/components/Web/navbar';
 import Footer from 'shared/components/Web/footer';
 

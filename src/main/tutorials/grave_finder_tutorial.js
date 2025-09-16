@@ -9,7 +9,7 @@ function GraveFinderTutorial(){
   <title>Explore Eternity - Selected residents of Albany Rural Cemetery</title>
   <meta charSet="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="assets/css/main.css" />
+  {/* <link rel="stylesheet" href="assets/css/main.css" /> */}
   {/* Header */}
   <header id="header" className="special">
     <h1>

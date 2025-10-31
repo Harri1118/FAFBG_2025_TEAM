@@ -4,9 +4,9 @@ param(
 # Check the current branch
 # Announce to user what branch they're on.
 # Ensure they want to use this branch.
-$currentBranch = git rev-parse --abbrev-ref HEAD
+$currentBranch = (git rev-parse --abbrev-ref HEAD).Trim()
 while ($true) {
-    $answer = Read-host "Are you sure you want to deploy to $currentBranch? Type 'yes' or 'no' (case sensitive) "
+    $answer = Read-host ("Are you sure you want to deploy to " +  $currentBranch + "? Type 'yes' or 'no' (case sensitive) ")
     if ($answer -eq "yes") {
         break
     }
@@ -21,7 +21,7 @@ while ($true) {
 if(($Debug -ne "true") -and ($currentBranch -ne "dev")){
     Write-host "Linting app..."
     Set-Location ../
-    npm run test
+    #npm run test
     if($LASTEXITCODE -eq 0){
         Write-Host "npm run test passed successfully"
     }

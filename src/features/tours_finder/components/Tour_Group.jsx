@@ -68,6 +68,8 @@ const Tour_Group = ({ data, color, tourGroup, keyWord }) => {
           ShortBio = feature.properties.Service_Re
         if(Image_Name == null || Image_Name == "null")
           Image_Name = feature.properties.Bio_Portra
+        if(Image_Name == "NONE")
+          Image_Name = "Unknown";
         const popupId = `popup-${feature.properties.id || feature.properties.Full_Name.replace(/\s+/g, '-')}`;
 
         const popupHTML = `
@@ -85,10 +87,12 @@ const Tour_Group = ({ data, color, tourGroup, keyWord }) => {
                  </div>
               ` : ""}
               ${HeadStone ? `<p>Headstone:  ${HeadStone}</p>` : ""}
-              ${Image_Name ? `<img src="https://www.albany.edu/arce/images/${Image_Name}" style="width: 100%; border-radius: 4px; margin-top: 5px;" />` : ""}
-              ${
-                Link ? (`<button id="${popupId}" style="margin-top: 8px;">More Info</button>`) : ("")
-              }
+              ${(Image_Name != "Unknown") ? (`<img src="https://www.albany.edu/arce/images/${Image_Name}" style="width: 100%; border-radius: 4px; margin-top: 5px;" />`) : (``)}
+              ${(Link != "Unknown") ? (
+                `<button id=${popupId} style={{ marginTop: "8px" }}>
+                  More Info
+                </button>`
+              ) : (``)}
           </div>
         `;
         layer.bindPopup(popupHTML);

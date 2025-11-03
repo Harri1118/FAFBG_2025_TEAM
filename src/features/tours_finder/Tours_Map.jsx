@@ -31,7 +31,7 @@ import * as turf from '@turf/turf';  // Geospatial calculations library
 import { 
   Autocomplete, TextField, Paper, InputAdornment, IconButton,
   List, ListItem, ListItemText, Divider, Box, Typography,
-  ButtonGroup, Button 
+  ButtonGroup, Button, useMediaQuery 
 } from '@mui/material';
 import PinDropIcon from '@mui/icons-material/PinDrop';
 import SearchIcon from '@mui/icons-material/Search';
@@ -145,6 +145,7 @@ export default function ToursMap() {
   // State Management
   //-----------------------------------------------------------------------------
   
+
   // Map and UI State
   const [overlayMaps, setOverlayMaps] = useState({});
   const [currentZoom, setCurrentZoom] = useState(14);
@@ -562,7 +563,7 @@ export default function ToursMap() {
             <TourGroup data={MayorsTour} color="#ff00dd" tourGroup="Mayors of Albany" keyWord="Mayors of Albany" />
             <TourGroup data={GARTour} color="#000080" tourGroup="Grand Army of the Republic" keyWord="G A R" />
           <LayerGroup>
-            <LayersControl.Overlay checked name="Sections">
+            <LayersControl.Overlay name="Sections">
               
               <GeoJSON 
                 data={ARC_Sections}
